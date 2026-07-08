@@ -2,31 +2,47 @@
 
 ## 1. Product Experience Model
 
-CareerLens should feel like a structured career intelligence workspace. The user should not land in an empty chat window. The primary experience is a workspace with persistent profile, market intelligence, opportunity analysis, roadmap, and application pipeline.
+CareerLens should feel like a structured talent-role alignment workspace. The user should not land in an empty chat window. The primary experience is a guided SaaS workflow that turns a resume and target role into capability intelligence, role intelligence, an explainable alignment report, resume optimization guidance, and a development plan.
+
+The core workflow is:
+
+```text
+Resume Upload
+  -> Resume Intelligence
+  -> Talent Capability Graph
+  -> Role Intelligence
+  -> Talent-Role Alignment Report
+  -> Resume Optimization
+  -> Career Development Plan
+```
 
 ## 2. Primary Navigation
 
 Recommended main navigation:
 
 - Home
-- Career Profile
-- Market Intelligence
-- Opportunities
-- Strategy Roadmap
-- Applications
-- AI Workspace
+- Resume Intelligence
+- Capability Graph
+- Role Intelligence
+- Alignment Reports
+- Resume Optimization
+- Development Plan
 - Settings
+
+Post-MVP navigation may add Applications, Interview Prep, and Organization workspaces.
 
 ## 3. First-Time User Flow
 
 ```text
 Landing / Signup
   -> Onboarding
-  -> Profile Input
-  -> Career Profile Analysis
-  -> Target Path Selection
-  -> First Opportunity Match
-  -> Strategy Roadmap
+  -> Resume Upload
+  -> Resume Review
+  -> Capability Graph Generation
+  -> Target Role Analysis
+  -> First Alignment Report
+  -> Resume Optimization
+  -> Development Plan
   -> Workspace Home
 ```
 
@@ -37,267 +53,356 @@ User creates an account with email or OAuth.
 The product asks for minimal initial information:
 
 - Education or current role
-- Target career path
+- Target role family
 - Experience level
-- Preferred industries
+- Preferred industries or companies
+- Target location or constraints where relevant
 
-### Step 2: Profile Input
+### Step 2: Resume Upload
 
-User can provide:
+User provides a resume through:
 
-- Resume text or file
-- LinkedIn-style profile information
+- PDF upload
+- Pasted resume text
+- Manual profile entry when no resume is available
+
+The UI should show upload status, extraction status, and privacy expectations.
+
+### Step 3: Resume Intelligence Review
+
+CareerLens extracts:
+
+- Experiences
 - Projects
+- Education
 - Skills
-- Career preferences
+- Achievements
+- Metrics and outcomes
+- Evidence statements
+- Missing or weak evidence
 
-The UI should support both upload and manual editing.
+User reviews and edits extracted data before it becomes canonical profile context.
 
-### Step 3: Profile Analysis
+### Step 4: Talent Capability Graph
 
 CareerLens generates:
 
-- Professional identity summary
 - Capability map
+- Capability categories
+- Evidence links
+- Confidence scores
 - Strengths
-- Weaknesses
-- Suitable career directions
+- Skill and evidence gaps
 - Missing information prompts
 
-User reviews and edits the profile before using it for matching.
+User can inspect which resume evidence supports each capability and mark capabilities as verified, developing, or aspirational.
 
-### Step 4: Target Path Selection
+### Step 5: Target Role Analysis
 
-User selects one or more career paths:
+User provides a target role through:
 
-- AI Engineer
-- Software Engineer
-- AI Product Manager
-- AI Solution Engineer
-- Data roles
-- Other technology role
+- Job description paste
+- Job description upload
+- Curated role template
+- Manual role entry
 
-CareerLens adapts scoring and roadmap logic based on the selected path.
+CareerLens generates Role Intelligence:
 
-### Step 5: First Opportunity Match
+- Explicit requirements
+- Hidden competency inferences
+- Real job workflow explanation
+- Evaluation signals
+- Seniority expectations
+- Evidence examples
+- Requirement confidence
 
-User chooses a company or creates an opportunity.
+### Step 6: First Alignment Report
 
-CareerLens produces:
+CareerLens compares the Talent Capability Graph with Role Intelligence and produces:
 
-- Match score
-- Score breakdown
-- Evidence
-- Strengths
-- Skill gaps
-- Application recommendation
+- Overall alignment score
+- Capability-level alignment
+- Requirement coverage
+- Evidence-backed strengths
+- Prioritized gaps
+- Risks and assumptions
+- Confidence indicators
+- Recommended decision posture
 
-### Step 6: Strategy Roadmap
+The score should feel explainable and directional, not falsely precise.
 
-CareerLens generates a roadmap:
+### Step 7: Resume Optimization
+
+CareerLens generates role-specific resume optimization suggestions:
+
+- Capability coverage checklist
+- Bullet improvement guidance
+- Evidence placement suggestions
+- Missing evidence warnings
+- Low-value content to reduce or remove
+
+The product must distinguish stronger communication of existing evidence from gaps that require new work.
+
+### Step 8: Career Development Plan
+
+CareerLens generates a gap-based plan:
 
 - 2-week actions
-- 1-month actions
-- 3-month skill plan
+- 1-month priorities
+- 3-month capability plan
 - Project recommendations
-- Application strategy
+- Interview preparation focus
+- Evidence-building actions
 
-User can save roadmap items as tasks.
+Each action links back to role requirements and alignment gaps.
 
 ## 4. Returning User Flow
 
 ```text
 Open Home
-  -> Review profile status, active opportunities, roadmap progress
-  -> Continue application preparation
-  -> Update profile or target path
-  -> Re-run match reports
+  -> Review capability graph status, active target roles, and latest reports
+  -> Update resume or profile evidence
+  -> Analyze a new role
+  -> Re-run alignment report
+  -> Continue optimization or development plan
 ```
 
 The home view should prioritize:
 
-- Profile completeness
-- Active target opportunities
-- Top skill gaps
-- Roadmap progress
-- Upcoming preparation tasks
-- Recent AI insights
+- Resume parsing and review status
+- Capability graph completeness
+- Active target roles
+- Latest alignment reports
+- Top gap themes
+- Development plan progress
+- Recent AI-generated insights that need review
 
-## 5. Career Profile Flow
+## 5. Resume Intelligence Flow
 
 ```text
-Career Profile
-  -> Profile Overview
-  -> Capability Map
-  -> Experience and Projects
-  -> Skills
-  -> Preferences
-  -> Profile Versions
+Resume Intelligence
+  -> Upload or Paste Resume
+  -> Extract Text
+  -> Parse Sections
+  -> Review Extracted Records
+  -> Confirm Profile Updates
+  -> Generate or Refresh Capability Graph
 ```
 
 ### Key Interactions
 
-- Edit profile sections
-- Re-run profile analysis
-- Compare profile versions
-- Mark skills as verified, developing, or aspirational
-- Add evidence to skills through projects or experience
+- Upload resume PDF
+- Retry failed extraction
+- Edit parsed sections
+- Link evidence to projects or experiences
+- Resolve duplicate skills or achievements
+- Accept or reject AI-extracted records
 
-## 6. Market Intelligence Flow
+### Resume Intelligence States
 
-```text
-Market Intelligence
-  -> Search Company or Industry
-  -> Open Intelligence Page
-  -> Save Company
-  -> Compare With Profile
-  -> Create Opportunity
-```
+- No resume uploaded
+- Uploading
+- Extracting text
+- Parsing resume
+- Review required
+- Ready for capability graph
+- Extraction failed
 
-### Company Page Sections
-
-- Overview
-- Business model
-- AI strategy
-- Product areas
-- Technical focus
-- Hiring signals
-- Relevant roles
-- Fit with current profile
-
-### Industry Page Sections
-
-- Emerging roles
-- Skill trends
-- Technology changes
-- Hiring market notes
-- Suggested preparation areas
-
-## 7. Opportunity Matching Flow
+## 6. Capability Graph Flow
 
 ```text
-Opportunities
-  -> Create or Import Opportunity
-  -> Select Company and Role
-  -> Review Requirements
-  -> Generate Match Report
-  -> Save to Application Pipeline
+Capability Graph
+  -> Overview
+  -> Capability Categories
+  -> Evidence Panel
+  -> Confidence and Gaps
+  -> Profile Versions
 ```
 
-### Match Report Layout
+### Capability Graph Sections
+
+- Technical capabilities
+- Product and business capabilities
+- Domain knowledge
+- Communication and collaboration
+- Leadership and execution
+- Evidence quality
+- Skill gaps
+
+### Key Interactions
+
+- Filter capabilities by role family
+- Inspect supporting evidence
+- Mark capability status
+- Add missing evidence
+- Compare graph versions
+- Refresh analysis after profile changes
+
+## 7. Role Intelligence Flow
+
+```text
+Role Intelligence
+  -> Add Target Role
+  -> Paste or Upload Job Description
+  -> Extract Requirements
+  -> Review Hidden Competencies
+  -> Inspect Real Workflow
+  -> Save Target Role
+```
+
+### Role Intelligence Sections
+
+- Role overview
+- Explicit requirements
+- Hidden competency inferences
+- Real job workflow
+- Evaluation signals
+- Required evidence examples
+- Seniority expectations
+- Confidence and assumptions
+
+### Key Interactions
+
+- Edit extracted requirements
+- Adjust role family or seniority
+- Compare with a curated role template
+- Save target role for alignment
+- Re-analyze role after JD changes
+
+## 8. Alignment Report Flow
+
+```text
+Alignment Reports
+  -> Select Capability Graph
+  -> Select Target Role
+  -> Generate Alignment Report
+  -> Review Scores, Evidence, Strengths, and Gaps
+  -> Continue to Resume Optimization or Development Plan
+```
+
+### Alignment Report Layout
 
 The report should show:
 
-- Overall match score
-- Score breakdown
-- Evidence by category
-- Strengths
-- Gaps
-- Risks
-- Recommended action
+- Overall alignment
+- Dimension score breakdown
+- Requirement coverage
+- Evidence-backed strengths
+- Prioritized gaps
+- Risk and uncertainty indicators
+- Confidence levels
+- Recommended decision posture
 
-The score should feel explainable and directional, not falsely precise.
+### Alignment Dimensions
 
-## 8. Strategy Roadmap Flow
+- Capability match
+- Evidence strength
+- Experience relevance
+- Requirement coverage
+- Gap severity
+- Confidence
+
+## 9. Resume Optimization Flow
 
 ```text
-Strategy Roadmap
-  -> Select target role or opportunity
-  -> Generate roadmap
-  -> Review milestones
-  -> Save tasks
-  -> Track progress
+Resume Optimization
+  -> Select Alignment Report
+  -> Review Capability Coverage
+  -> Inspect Suggestions
+  -> Accept, Reject, or Revise Suggestions
+  -> Export Guidance or Update Resume Draft
 ```
 
-### Roadmap Time Horizons
+### Optimization Suggestion Types
+
+- Evidence placement
+- Bullet improvement
+- Section gap
+- Wording clarity
+- Noise reduction
+- Missing evidence warning
+
+### Design Requirements
+
+- Suggestions must reference target role requirements.
+- Suggestions must reference existing candidate evidence when rewriting is possible.
+- Suggestions must warn when the issue is a real capability or evidence gap.
+- The product should not fabricate achievements.
+
+## 10. Career Development Plan Flow
+
+```text
+Development Plan
+  -> Select Alignment Report
+  -> Generate Gap-Based Plan
+  -> Review Milestones
+  -> Save Actions
+  -> Track Progress
+  -> Refresh Plan After Capability Updates
+```
+
+### Plan Time Horizons
 
 - Immediate: next 1-2 weeks
 - Short term: next 1 month
 - Medium term: next 3 months
-- Strategic: next 6-12 months
+- Strategic: next 6 months
 
-### Roadmap Item Types
+### Plan Action Types
 
 - Skill learning
 - Project building
-- Resume improvement
-- Company research
+- Evidence creation
+- Role workflow practice
 - Interview preparation
-- Networking action
+- Company or domain research
 
-## 9. Application Intelligence Flow
+## 11. AI Workspace Flow
 
-```text
-Applications
-  -> Pipeline Board
-  -> Opportunity Detail
-  -> Preparation Checklist
-  -> Resume Version
-  -> Interview Prep
-  -> Outcome Notes
-```
-
-### Application Statuses
-
-- Researching
-- Preparing
-- Applied
-- Interviewing
-- Offer
-- Rejected
-- Archived
-
-### Application Detail Should Include
-
-- Role and company
-- Match report
-- Resume version
-- Preparation tasks
-- Notes
-- Interview questions
-- Follow-up reminders
-
-## 10. AI Workspace Flow
-
-The AI workspace should support open-ended interaction, but it must stay connected to structured product objects.
+The AI workspace may support open-ended interaction, but it must stay connected to structured product objects.
 
 Examples:
 
-- "Compare my profile with ByteDance AI Product Manager roles."
-- "What projects would improve my AI Engineer profile?"
-- "Explain why my domain alignment score is low."
-- "Turn this roadmap recommendation into weekly tasks."
+- "Explain why my evidence strength is low for this role."
+- "Which capabilities should I build before applying?"
+- "What resume evidence supports my product thinking score?"
+- "Turn this development plan into weekly milestones."
 
 The AI should be able to reference:
 
-- Profile
-- Companies
-- Opportunities
-- Match reports
-- Roadmaps
-- Application notes
+- Resume versions
+- Capability graphs
+- Target roles
+- Role requirements
+- Alignment reports
+- Resume optimization suggestions
+- Development plans
 
-## 11. Key UX States
+The AI workspace should not replace the structured workflow.
+
+## 12. Key UX States
 
 ### Empty States
 
 Empty states should guide users toward concrete actions:
 
-- Add profile information
-- Analyze profile
-- Save a company
-- Create opportunity
-- Generate match report
+- Upload a resume
+- Review extracted resume data
+- Generate a capability graph
+- Analyze a target role
+- Generate an alignment report
 
 ### Loading States
 
 AI workflows should show meaningful progress:
 
-- Reading profile
-- Retrieving company intelligence
-- Comparing requirements
-- Generating explanation
-- Saving report
+- Reading resume
+- Extracting evidence
+- Building capability graph
+- Analyzing role requirements
+- Comparing capabilities and requirements
+- Generating explanations
+- Saving structured report
 
 ### Error States
 
@@ -306,16 +411,26 @@ Errors should explain:
 - What failed
 - Whether user data was saved
 - What the user can retry
+- Whether AI analysis can continue with partial data
 
-## 12. Design Tone
+## 13. Design Tone
 
 CareerLens should use concise, professional product language:
 
-- "Career Profile"
-- "Market Intelligence"
-- "Match Report"
+- "Resume Intelligence"
+- "Capability Graph"
+- "Role Intelligence"
+- "Alignment Report"
+- "Evidence"
+- "Confidence"
 - "Skill Gap"
-- "Roadmap"
-- "Application Pipeline"
+- "Resume Optimization"
+- "Development Plan"
 
-Avoid fluffy AI phrases and over-personified assistant copy.
+Avoid:
+
+- Fluffy AI phrases
+- Over-personified assistant copy
+- Chatbot-first labels
+- Resume-writer-only language
+- Black-box score language

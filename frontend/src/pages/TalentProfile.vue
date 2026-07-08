@@ -1,23 +1,38 @@
 <template>
-  <section class="page-section talent-profile">
+  <section class="page-section resume-intelligence">
     <header class="profile-header">
       <p class="eyebrow">{{ t("pages.talentProfile.eyebrow") }}</p>
       <h1>{{ t("pages.talentProfile.title") }}</h1>
       <p class="lede">{{ t("pages.talentProfile.lede") }}</p>
     </header>
 
-    <div class="profile-workspace">
-      <form class="profile-form" @submit.prevent="handleAnalyze">
-        <label v-for="field in fields" :key="field.key" class="field-group">
-          <span>{{ t(field.labelKey) }}</span>
-          <textarea
-            v-model="form[field.key]"
-            :placeholder="t(field.placeholderKey)"
-            rows="5"
+    <div class="intelligence-workspace">
+      <form class="upload-panel" @submit.prevent="handleAnalyze">
+        <label class="upload-dropzone">
+          <span class="upload-title">{{ t("pages.talentProfile.upload.title") }}</span>
+          <span class="upload-copy">{{ selectedFileName || t("pages.talentProfile.upload.description") }}</span>
+          <input
+            type="file"
+            accept=".pdf,.txt,.md,.doc,.docx"
+            @change="handleFileChange"
           />
         </label>
 
-        <button class="analyze-button" type="submit" :disabled="isAnalyzing">
+        <label class="field-group">
+          <span>{{ t("pages.talentProfile.fields.resumeText.label") }}</span>
+          <textarea
+            v-model="resumeText"
+            :placeholder="t('pages.talentProfile.fields.resumeText.placeholder')"
+            rows="10"
+          />
+        </label>
+
+        <div class="upload-meta">
+          <span>{{ t("pages.talentProfile.upload.status") }}</span>
+          <strong>{{ uploadStatus }}</strong>
+        </div>
+
+        <button class="analyze-button" type="submit" :disabled="isAnalyzing || !canAnalyze">
           {{ isAnalyzing ? t("pages.talentProfile.actions.analyzing") : t("pages.talentProfile.actions.analyze") }}
         </button>
 
@@ -26,25 +41,79 @@
 
       <section
         v-if="analysis"
-        class="report-panel"
+        class="analysis-panel"
         :aria-label="t('pages.talentProfile.report.ariaLabel')"
       >
         <article class="identity-card">
-          <span class="card-label">{{ t("pages.talentProfile.report.careerIdentity") }}</span>
-          <p>{{ analysis.career_identity }}</p>
+          <div>
+            <span class="card-label">{{ t("pages.talentProfile.report.candidateIdentity") }}</span>
+            <h2>{{ analysis.candidate_identity.headline }}</h2>
+          </div>
+          <span class="confidence-badge">
+            {{ formatConfidence(analysis.candidate_identity.confidence) }}
+          </span>
+          <p>{{ analysis.candidate_identity.summary }}</p>
         </article>
 
-        <div class="report-grid">
+        <div class="section-heading">
+          <span class="card-label">{{ t("pages.talentProfile.report.capabilities") }}</span>
+          <strong>{{ analysis.capabilities.length }}</strong>
+        </div>
+
+        <div class="capability-grid">
           <article
-            v-for="card in reportCards"
-            :key="card.title"
-            class="report-card"
+            v-for="capability in analysis.capabilities"
+            :key="capability.capability_id"
+            class="capability-card"
           >
-            <span class="card-label">{{ card.title }}</span>
-            <ul>
-              <li v-for="item in card.items" :key="item">{{ item }}</li>
-            </ul>
+            <div class="card-topline">
+              <h3>{{ capability.name }}</h3>
+              <span>{{ formatConfidence(capability.confidence) }}</span>
+            </div>
+            <p>{{ capability.rationale }}</p>
+            <div class="tag-row">
+              <span>{{ capability.category }}</span>
+              <span>{{ capability.level }}</span>
+            </div>
           </article>
+        </div>
+
+        <div class="evidence-layout">
+          <section class="evidence-panel">
+            <div class="section-heading">
+              <span class="card-label">{{ t("pages.talentProfile.report.evidence") }}</span>
+              <strong>{{ analysis.experience_evidence.length }}</strong>
+            </div>
+            <article
+              v-for="item in analysis.experience_evidence"
+              :key="item.evidence_id"
+              class="evidence-card"
+            >
+              <div class="card-topline">
+                <span>{{ item.source_section }}</span>
+                <strong>{{ item.strength }}</strong>
+              </div>
+              <p>{{ item.excerpt }}</p>
+            </article>
+          </section>
+
+          <section class="suggestion-panel">
+            <div class="section-heading">
+              <span class="card-label">{{ t("pages.talentProfile.report.suggestions") }}</span>
+              <strong>{{ analysis.improvement_suggestions.length }}</strong>
+            </div>
+            <article
+              v-for="suggestion in analysis.improvement_suggestions"
+              :key="suggestion.suggestion_id"
+              class="suggestion-card"
+            >
+              <div class="card-topline">
+                <h3>{{ suggestion.title }}</h3>
+                <span>{{ suggestion.priority }}</span>
+              </div>
+              <p>{{ suggestion.rationale }}</p>
+            </article>
+          </section>
         </div>
       </section>
 
@@ -57,84 +126,65 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
-import { analyzeProfile, type ProfileAnalysisResponse } from "../services/api";
+import { analyzeResume, type ResumeAnalysisResponse } from "../services/api";
 
 const { t } = useI18n();
 
-type FormKey = "education" | "skills" | "projects" | "target_roles";
-
-const fields: Array<{
-  key: FormKey;
-  labelKey: string;
-  placeholderKey: string;
-}> = [
-  {
-    key: "education",
-    labelKey: "pages.talentProfile.fields.education.label",
-    placeholderKey: "pages.talentProfile.fields.education.placeholder"
-  },
-  {
-    key: "skills",
-    labelKey: "pages.talentProfile.fields.skills.label",
-    placeholderKey: "pages.talentProfile.fields.skills.placeholder"
-  },
-  {
-    key: "projects",
-    labelKey: "pages.talentProfile.fields.projects.label",
-    placeholderKey: "pages.talentProfile.fields.projects.placeholder"
-  },
-  {
-    key: "target_roles",
-    labelKey: "pages.talentProfile.fields.targetRoles.label",
-    placeholderKey: "pages.talentProfile.fields.targetRoles.placeholder"
-  }
-];
-
-const form = reactive<Record<FormKey, string>>({
-  education: "",
-  skills: "",
-  projects: "",
-  target_roles: ""
-});
-
-const analysis = ref<ProfileAnalysisResponse | null>(null);
+const selectedFile = ref<File | null>(null);
+const selectedFileName = ref("");
+const resumeText = ref("");
+const analysis = ref<ResumeAnalysisResponse | null>(null);
 const isAnalyzing = ref(false);
 const errorMessage = ref("");
 
-const toLines = (value: string): string[] => {
-  return value
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
-};
-
-const reportCards = computed(() => {
-  if (!analysis.value) {
-    return [];
+const canAnalyze = computed(() => Boolean(selectedFile.value || resumeText.value.trim()));
+const uploadStatus = computed(() => {
+  if (!selectedFile.value && !resumeText.value.trim()) {
+    return t("pages.talentProfile.upload.emptyStatus");
   }
 
-  return [
-    { title: t("pages.talentProfile.report.capabilities"), items: analysis.value.capabilities },
-    { title: t("pages.talentProfile.report.evidence"), items: analysis.value.evidence },
-    { title: t("pages.talentProfile.report.strengths"), items: analysis.value.strengths },
-    { title: t("pages.talentProfile.report.gaps"), items: analysis.value.gaps },
-    { title: t("pages.talentProfile.report.recommendedRoles"), items: analysis.value.recommended_roles }
-  ];
+  if (selectedFile.value) {
+    return t("pages.talentProfile.upload.readyStatus", {
+      name: selectedFile.value.name
+    });
+  }
+
+  return t("pages.talentProfile.upload.textReadyStatus");
 });
 
+const handleFileChange = async (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0] ?? null;
+  selectedFile.value = file;
+  selectedFileName.value = file?.name ?? "";
+  errorMessage.value = "";
+
+  if (!file) {
+    return;
+  }
+
+  if (isTextReadable(file)) {
+    resumeText.value = await file.text();
+  }
+};
+
 const handleAnalyze = async () => {
+  if (!canAnalyze.value) {
+    return;
+  }
+
   isAnalyzing.value = true;
   errorMessage.value = "";
 
   try {
-    analysis.value = await analyzeProfile({
-      education: toLines(form.education),
-      skills: toLines(form.skills),
-      projects: toLines(form.projects),
-      target_roles: toLines(form.target_roles)
+    analysis.value = await analyzeResume({
+      file_name: selectedFile.value?.name ?? "pasted-resume.txt",
+      content_type: selectedFile.value?.type,
+      file_size: selectedFile.value?.size ?? resumeText.value.length,
+      resume_text: resumeText.value
     });
   } catch {
     errorMessage.value = t("pages.talentProfile.errors.analysisFailed");
@@ -142,10 +192,20 @@ const handleAnalyze = async () => {
     isAnalyzing.value = false;
   }
 };
+
+const isTextReadable = (file: File): boolean => {
+  return (
+    file.type.startsWith("text/") ||
+    file.name.endsWith(".txt") ||
+    file.name.endsWith(".md")
+  );
+};
+
+const formatConfidence = (value: number): string => `${Math.round(value * 100)}%`;
 </script>
 
 <style scoped>
-.talent-profile {
+.resume-intelligence {
   max-width: 1180px;
 }
 
@@ -153,27 +213,63 @@ const handleAnalyze = async () => {
   margin-bottom: 28px;
 }
 
-.profile-workspace {
+.intelligence-workspace {
   display: grid;
-  grid-template-columns: minmax(300px, 420px) 1fr;
+  grid-template-columns: minmax(300px, 400px) 1fr;
   gap: 24px;
   align-items: start;
 }
 
-.profile-form,
+.upload-panel,
 .empty-report,
 .identity-card,
-.report-card {
+.capability-card,
+.evidence-card,
+.suggestion-card {
   border: 1px solid #dedbd2;
   border-radius: 8px;
   background: #fff;
   box-shadow: 0 1px 2px rgb(17 24 39 / 5%);
 }
 
-.profile-form {
+.upload-panel {
   display: grid;
   gap: 18px;
   padding: 20px;
+}
+
+.upload-dropzone {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  min-height: 148px;
+  align-content: center;
+  border: 1px dashed #9ca3af;
+  border-radius: 8px;
+  background: #fafafa;
+  color: #374151;
+  cursor: pointer;
+  padding: 22px;
+}
+
+.upload-dropzone input {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  opacity: 0;
+}
+
+.upload-title {
+  color: #111827;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.upload-copy,
+.upload-meta {
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .field-group {
@@ -202,6 +298,18 @@ const handleAnalyze = async () => {
   border-color: #2563eb;
 }
 
+.upload-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.upload-meta strong {
+  color: #111827;
+  font-weight: 650;
+  text-align: right;
+}
+
 .analyze-button {
   border: 0;
   border-radius: 8px;
@@ -214,8 +322,8 @@ const handleAnalyze = async () => {
 }
 
 .analyze-button:disabled {
-  cursor: progress;
-  opacity: 0.72;
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .error-message {
@@ -225,23 +333,47 @@ const handleAnalyze = async () => {
   line-height: 1.5;
 }
 
-.report-panel {
+.analysis-panel {
   display: grid;
   gap: 18px;
 }
 
 .identity-card,
-.report-card,
+.capability-card,
+.evidence-card,
+.suggestion-card,
 .empty-report {
   padding: 20px;
 }
 
-.identity-card p,
-.empty-report p {
-  margin: 10px 0 0;
+.identity-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+.identity-card p {
+  grid-column: 1 / -1;
+  margin: 0;
   color: #374151;
   font-size: 16px;
   line-height: 1.65;
+}
+
+h2,
+h3 {
+  margin: 0;
+  color: #111827;
+}
+
+h2 {
+  margin-top: 6px;
+  font-size: 22px;
+}
+
+h3 {
+  font-size: 15px;
+  line-height: 1.35;
 }
 
 .card-label {
@@ -252,28 +384,88 @@ const handleAnalyze = async () => {
   text-transform: uppercase;
 }
 
-.report-grid {
+.confidence-badge,
+.tag-row span,
+.card-topline span,
+.card-topline strong {
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #3730a3;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1;
+  padding: 7px 9px;
+  white-space: nowrap;
+}
+
+.section-heading,
+.card-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.section-heading strong {
+  color: #111827;
+  font-size: 14px;
+}
+
+.capability-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.capability-card,
+.evidence-card,
+.suggestion-card {
+  display: grid;
+  gap: 12px;
+}
+
+.capability-card p,
+.evidence-card p,
+.suggestion-card p,
+.empty-report p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-row span {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.evidence-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
   gap: 18px;
 }
 
-.report-card ul {
+.evidence-panel,
+.suggestion-panel {
   display: grid;
-  gap: 10px;
-  margin: 12px 0 0;
-  padding-left: 18px;
-  color: #374151;
-  line-height: 1.5;
+  gap: 12px;
+  align-content: start;
 }
 
 .empty-report {
   min-height: 280px;
 }
 
-@media (max-width: 980px) {
-  .profile-workspace,
-  .report-grid {
+@media (max-width: 1040px) {
+  .intelligence-workspace,
+  .evidence-layout,
+  .capability-grid {
     grid-template-columns: 1fr;
   }
 }

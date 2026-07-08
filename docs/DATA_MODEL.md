@@ -2,18 +2,19 @@
 
 ## 1. Data Model Principles
 
-CareerLens should store structured career intelligence as first-class data. AI-generated text should be persisted as versioned, inspectable records connected to source objects.
+CareerLens should store structured talent-role intelligence as first-class data. AI-generated analysis should be persisted as versioned, inspectable records connected to resume evidence, capability graph nodes, role requirements, and model metadata.
 
 Core principles:
 
-- User profile data is canonical and editable.
+- Resume, profile, capability, role, report, optimization, and plan records are versionable.
+- User-edited profile data is canonical.
 - AI outputs reference source records and model versions.
-- Match scores are decomposed into dimensions.
-- Company and market intelligence are reusable platform data.
-- Company-role targets connect talent profiles, role intelligence, company DNA, match reports, and action plans.
-- Application pipelines, workspace notes, LinkedIn integration, and real-time job scraping are post-MVP concerns.
+- Capabilities and role requirements are normalized so they can be compared.
+- Alignment scores are decomposed into dimensions with evidence and confidence.
+- Resume optimization suggestions must link to real evidence or identified gaps.
+- Application pipelines, LinkedIn integration, and real-time job scraping are post-MVP concerns.
 
-## 2. Core Entities
+## 2. User and Profile Entities
 
 ## 2.1 users
 
@@ -39,9 +40,9 @@ Stores the current canonical career profile for a user.
 | user_id | uuid | FK to users |
 | headline | text | Professional headline |
 | summary | text | Structured professional summary |
-| target_seniority | text | Student, intern, junior, mid-level |
-| current_status | text | Student, employed, searching |
-| primary_path | text | AI Engineer, Software Engineer, etc. |
+| target_seniority | text | student, intern, junior, mid |
+| current_status | text | student, employed, searching |
+| primary_role_family | text | AI Engineer, Software Engineer, etc. |
 | completeness_score | numeric | Profile completeness |
 | created_at | timestamptz | Created timestamp |
 | updated_at | timestamptz | Updated timestamp |
@@ -56,11 +57,13 @@ Stores snapshots of profile state and AI analysis over time.
 | profile_id | uuid | FK to career_profiles |
 | version_number | integer | Incrementing version |
 | snapshot_json | jsonb | Profile snapshot |
-| analysis_json | jsonb | Capability assessment |
+| analysis_json | jsonb | Capability and profile assessment |
 | source | text | manual, resume_import, agent_analysis |
 | created_at | timestamptz | Created timestamp |
 
-## 2.4 resumes
+## 3. Resume Intelligence Entities
+
+## 3.1 resumes
 
 Stores uploaded or pasted resume artifacts.
 
@@ -70,12 +73,60 @@ Stores uploaded or pasted resume artifacts.
 | user_id | uuid | FK to users |
 | profile_id | uuid | FK to career_profiles |
 | title | text | Resume label |
+| source_type | text | pdf_upload, text_paste, manual_import |
 | raw_text | text | Extracted resume text |
 | file_uri | text | Optional object storage path |
+| parsing_status | text | pending, succeeded, failed |
+| created_at | timestamptz | Created timestamp |
+| updated_at | timestamptz | Updated timestamp |
+
+## 3.2 resume_versions
+
+Stores versioned resume parses and optimization states.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| id | uuid | Primary key |
+| resume_id | uuid | FK to resumes |
+| version_number | integer | Incrementing version |
+| raw_text_hash | text | Change detection |
 | parsed_json | jsonb | Extracted structured fields |
+| model_metadata_json | jsonb | Model and prompt metadata |
 | created_at | timestamptz | Created timestamp |
 
-## 2.5 experiences
+## 3.3 resume_sections
+
+Stores parsed sections from a resume version.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| id | uuid | Primary key |
+| resume_version_id | uuid | FK to resume_versions |
+| section_type | text | summary, experience, project, education, skills, awards |
+| heading | text | Original section heading |
+| content | text | Section text |
+| order_index | integer | Resume order |
+| confidence | numeric | Extraction confidence |
+| created_at | timestamptz | Created timestamp |
+
+## 3.4 resume_evidence
+
+Stores atomic evidence extracted from resumes and linked to capabilities or requirements.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| id | uuid | Primary key |
+| resume_version_id | uuid | FK to resume_versions |
+| section_id | uuid | Nullable FK to resume_sections |
+| evidence_type | text | achievement, responsibility, technology, metric, credential |
+| text | text | Evidence excerpt or normalized statement |
+| normalized_json | jsonb | Structured evidence details |
+| confidence | numeric | Extraction confidence |
+| created_at | timestamptz | Created timestamp |
+
+## 4. Profile Detail Entities
+
+## 4.1 experiences
 
 Stores work, internship, research, and leadership experience.
 
@@ -83,6 +134,7 @@ Stores work, internship, research, and leadership experience.
 | --- | --- | --- |
 | id | uuid | Primary key |
 | profile_id | uuid | FK to career_profiles |
+| source_resume_evidence_id | uuid | Nullable FK to resume_evidence |
 | organization | text | Company, lab, or team |
 | title | text | Role title |
 | experience_type | text | internship, full_time, research, campus |
@@ -93,7 +145,7 @@ Stores work, internship, research, and leadership experience.
 | created_at | timestamptz | Created timestamp |
 | updated_at | timestamptz | Updated timestamp |
 
-## 2.6 projects
+## 4.2 projects
 
 Stores user projects as evidence for capabilities.
 
@@ -101,6 +153,7 @@ Stores user projects as evidence for capabilities.
 | --- | --- | --- |
 | id | uuid | Primary key |
 | profile_id | uuid | FK to career_profiles |
+| source_resume_evidence_id | uuid | Nullable FK to resume_evidence |
 | name | text | Project name |
 | description | text | Project summary |
 | role | text | User's role |
@@ -110,7 +163,24 @@ Stores user projects as evidence for capabilities.
 | created_at | timestamptz | Created timestamp |
 | updated_at | timestamptz | Updated timestamp |
 
-## 2.7 skills
+## 4.3 education_records
+
+Stores education records and credentials.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| id | uuid | Primary key |
+| profile_id | uuid | FK to career_profiles |
+| institution | text | School or program |
+| degree | text | Degree or credential |
+| field_of_study | text | Major or specialization |
+| start_date | date | Nullable |
+| end_date | date | Nullable |
+| evidence_json | jsonb | Courses, awards, GPA, certificates |
+| created_at | timestamptz | Created timestamp |
+| updated_at | timestamptz | Updated timestamp |
+
+## 4.4 skills
 
 Stores normalized skills.
 
@@ -122,7 +192,7 @@ Stores normalized skills.
 | normalized_name | text | Deduplication key |
 | created_at | timestamptz | Created timestamp |
 
-## 2.8 profile_skills
+## 4.5 profile_skills
 
 Connects skills to user profiles.
 
@@ -138,7 +208,7 @@ Connects skills to user profiles.
 | created_at | timestamptz | Created timestamp |
 | updated_at | timestamptz | Updated timestamp |
 
-## 2.9 career_preferences
+## 4.6 career_preferences
 
 Stores career preference signals.
 
@@ -154,49 +224,73 @@ Stores career preference signals.
 | constraints_json | jsonb | Visa, location, timing, etc. |
 | updated_at | timestamptz | Updated timestamp |
 
-## 3. Market Intelligence Entities
+## 5. Capability Intelligence Entities
 
-## 3.1 companies
+## 5.1 capability_graphs
 
-Stores company intelligence records.
-
-| Field | Type | Notes |
-| --- | --- | --- |
-| id | uuid | Primary key |
-| name | text | Company name |
-| slug | text | Unique URL key |
-| headquarters | text | Optional |
-| industry | text | Primary industry |
-| company_stage | text | large_tech, startup, enterprise |
-| business_model | text | Structured summary |
-| ai_strategy | text | AI strategy summary |
-| product_areas | text[] | Major products |
-| technical_focus | text[] | Technical domains |
-| hiring_preferences_json | jsonb | Candidate signals |
-| company_dna_json | jsonb | Talent needs, working style signals, strategic priorities |
-| source_notes_json | jsonb | Source metadata |
-| last_reviewed_at | timestamptz | Freshness tracking |
-| created_at | timestamptz | Created timestamp |
-| updated_at | timestamptz | Updated timestamp |
-
-## 3.2 industry_insights
-
-Stores reusable industry and role trend intelligence.
+Stores versioned Talent Capability Graphs.
 
 | Field | Type | Notes |
 | --- | --- | --- |
 | id | uuid | Primary key |
-| title | text | Insight title |
-| industry | text | Industry category |
-| role_family | text | AI, software, product, data |
-| summary | text | Human-readable insight |
-| skill_trends | text[] | Relevant skills |
-| source_notes_json | jsonb | Source metadata |
-| valid_from | date | Start date |
-| valid_to | date | Optional |
+| user_id | uuid | FK to users |
+| profile_id | uuid | FK to career_profiles |
+| profile_version_id | uuid | FK to profile_versions |
+| graph_version | integer | Incrementing graph version |
+| summary | text | Capability graph summary |
+| completeness_score | numeric | Evidence coverage |
+| model_metadata_json | jsonb | Model and prompt metadata |
 | created_at | timestamptz | Created timestamp |
 
-## 3.3 role_templates
+## 5.2 capabilities
+
+Stores normalized capability nodes.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| id | uuid | Primary key |
+| graph_id | uuid | FK to capability_graphs |
+| name | text | Capability name |
+| category | text | technical, product, domain, collaboration, leadership |
+| level | text | emerging, working, strong, advanced |
+| confidence | numeric | Confidence in inferred capability |
+| rationale | text | Why this capability was inferred |
+| status | text | verified, developing, aspirational |
+| created_at | timestamptz | Created timestamp |
+
+## 5.3 capability_evidence
+
+Links capabilities to supporting evidence.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| id | uuid | Primary key |
+| capability_id | uuid | FK to capabilities |
+| source_type | text | resume_evidence, experience, project, education, profile_skill |
+| source_id | uuid | Source record ID |
+| evidence_strength | text | weak, moderate, strong |
+| confidence | numeric | Link confidence |
+| notes | text | Evidence rationale |
+| created_at | timestamptz | Created timestamp |
+
+## 5.4 capability_gaps
+
+Stores known or inferred capability gaps.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| id | uuid | Primary key |
+| graph_id | uuid | FK to capability_graphs |
+| capability_name | text | Gap area |
+| category | text | technical, product, domain, collaboration, leadership |
+| severity | text | low, medium, high |
+| evidence_need | text | What evidence would reduce the gap |
+| confidence | numeric | Gap confidence |
+| created_at | timestamptz | Created timestamp |
+
+## 6. Role Intelligence Entities
+
+## 6.1 role_templates
 
 Stores reusable role expectations.
 
@@ -206,56 +300,89 @@ Stores reusable role expectations.
 | role_name | text | Example: AI Product Manager |
 | role_family | text | AI, software, product, data |
 | seniority | text | intern, junior, mid |
-| required_skills | text[] | Expected skills |
-| preferred_skills | text[] | Nice-to-have skills |
+| required_capabilities | text[] | Expected capabilities |
+| preferred_capabilities | text[] | Nice-to-have capabilities |
 | responsibilities | text[] | Common responsibilities |
 | evaluation_signals | text[] | What hiring teams value |
-| evidence_examples_json | jsonb | Projects, experiences, or artifacts that demonstrate fit |
-| interview_focus_json | jsonb | Likely interview and preparation areas |
+| workflow_json | jsonb | Real job workflow explanation |
+| evidence_examples_json | jsonb | Artifacts that demonstrate fit |
 | created_at | timestamptz | Created timestamp |
 | updated_at | timestamptz | Updated timestamp |
 
-## 4. Target and Matching Entities
+## 6.2 target_roles
 
-## 4.1 company_role_targets
-
-Stores user-created company-role targets for decision analysis. These are not application pipeline records.
+Stores user-created target roles or job descriptions for analysis.
 
 | Field | Type | Notes |
 | --- | --- | --- |
 | id | uuid | Primary key |
 | user_id | uuid | FK to users |
-| company_id | uuid | Nullable FK to companies |
 | role_template_id | uuid | Nullable FK to role_templates |
 | title | text | Role title |
+| company_name | text | Optional company name |
 | role_family | text | AI, software, product, data |
 | seniority | text | intern, junior, mid |
 | location | text | Optional |
 | source_url | text | Optional |
-| description | text | Optional manually entered role description |
-| requirements_json | jsonb | Normalized requirements |
-| status | text | active, archived |
+| jd_text | text | Original job description |
+| analysis_status | text | pending, succeeded, failed |
 | created_at | timestamptz | Created timestamp |
 | updated_at | timestamptz | Updated timestamp |
 
-## 4.2 match_reports
+## 6.3 role_requirements
 
-Stores explainable company-role target matching results.
+Stores normalized explicit and inferred role requirements.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| id | uuid | Primary key |
+| target_role_id | uuid | FK to target_roles |
+| requirement_type | text | explicit, hidden_inference, preferred |
+| capability_name | text | Normalized capability |
+| category | text | technical, product, domain, collaboration, leadership |
+| importance | text | low, medium, high, critical |
+| evidence_expectation | text | Evidence that would demonstrate readiness |
+| source_text | text | JD excerpt or inference note |
+| rationale | text | Requirement explanation |
+| confidence | numeric | Requirement confidence |
+| created_at | timestamptz | Created timestamp |
+
+## 6.4 role_workflows
+
+Stores real job workflow explanations.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| id | uuid | Primary key |
+| target_role_id | uuid | FK to target_roles |
+| workflow_summary | text | What the role likely does day to day |
+| responsibility_map_json | jsonb | Responsibilities mapped to capabilities |
+| collaboration_context_json | jsonb | Teams, stakeholders, handoffs |
+| evaluation_signals_json | jsonb | Signals used in hiring or performance |
+| confidence | numeric | Workflow confidence |
+| created_at | timestamptz | Created timestamp |
+
+## 7. Alignment Entities
+
+## 7.1 alignment_reports
+
+Stores explainable Talent-Role Alignment Reports.
 
 | Field | Type | Notes |
 | --- | --- | --- |
 | id | uuid | Primary key |
 | user_id | uuid | FK to users |
 | profile_id | uuid | FK to career_profiles |
-| profile_version_id | uuid | FK to profile_versions |
-| target_id | uuid | FK to company_role_targets |
+| capability_graph_id | uuid | FK to capability_graphs |
+| target_role_id | uuid | FK to target_roles |
 | overall_score | numeric | 0-100 directional score |
 | confidence_level | text | low, medium, high |
-| recommendation | text | pursue_now, prepare_first, deprioritize |
+| recommendation | text | strong_fit, possible_fit, prepare_first, low_fit |
 | summary | text | Human-readable result |
 | score_breakdown_json | jsonb | Dimension scores |
 | strengths_json | jsonb | Evidence-backed strengths |
-| gaps_json | jsonb | Skill and experience gaps |
+| gaps_json | jsonb | Capability and evidence gaps |
+| risks_json | jsonb | Important uncertainties or mismatch risks |
 | evidence_json | jsonb | Source references supporting the analysis |
 | assumptions_json | jsonb | Agent assumptions |
 | model_metadata_json | jsonb | Model, prompt, token metadata |
@@ -265,89 +392,114 @@ Stores explainable company-role target matching results.
 
 ```json
 {
-  "skill_alignment": 76,
-  "experience_relevance": 68,
-  "domain_alignment": 55,
-  "career_preference_alignment": 82,
-  "evidence_strength": 64,
+  "capability_match": 76,
+  "evidence_strength": 68,
+  "experience_relevance": 72,
+  "requirement_coverage": 64,
+  "gap_severity": 58,
   "confidence": 70
 }
 ```
 
-## 5. Career Action Plan Entities
+## 7.2 alignment_requirement_results
 
-## 5.1 action_plans
+Stores requirement-level alignment decisions.
 
-Stores generated career action plans.
+| Field | Type | Notes |
+| --- | --- | --- |
+| id | uuid | Primary key |
+| report_id | uuid | FK to alignment_reports |
+| role_requirement_id | uuid | FK to role_requirements |
+| status | text | met, partially_met, missing, unclear |
+| matched_capability_ids | uuid[] | Related capabilities |
+| evidence_json | jsonb | Supporting or missing evidence |
+| gap_severity | text | low, medium, high |
+| confidence | numeric | Match confidence |
+| explanation | text | Requirement-level rationale |
+| created_at | timestamptz | Created timestamp |
+
+## 8. Resume Optimization Entities
+
+## 8.1 resume_optimizations
+
+Stores optimization sessions generated from an alignment report.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| id | uuid | Primary key |
+| user_id | uuid | FK to users |
+| resume_version_id | uuid | FK to resume_versions |
+| target_role_id | uuid | FK to target_roles |
+| alignment_report_id | uuid | FK to alignment_reports |
+| summary | text | Optimization overview |
+| model_metadata_json | jsonb | Model and prompt metadata |
+| created_at | timestamptz | Created timestamp |
+| updated_at | timestamptz | Updated timestamp |
+
+## 8.2 resume_optimization_suggestions
+
+Stores specific target-role resume suggestions.
+
+| Field | Type | Notes |
+| --- | --- | --- |
+| id | uuid | Primary key |
+| optimization_id | uuid | FK to resume_optimizations |
+| suggestion_type | text | evidence_placement, bullet_rewrite, section_gap, wording, remove_noise |
+| target_section_id | uuid | Nullable FK to resume_sections |
+| related_requirement_id | uuid | Nullable FK to role_requirements |
+| related_evidence_id | uuid | Nullable FK to resume_evidence |
+| title | text | Suggestion title |
+| rationale | text | Why the suggestion matters |
+| suggested_text | text | Optional suggested wording |
+| priority | integer | Lower number means higher priority |
+| status | text | proposed, accepted, rejected, revised |
+| confidence | numeric | Suggestion confidence |
+| created_at | timestamptz | Created timestamp |
+| updated_at | timestamptz | Updated timestamp |
+
+## 9. Career Development Plan Entities
+
+## 9.1 development_plans
+
+Stores generated Career Development Plans.
 
 | Field | Type | Notes |
 | --- | --- | --- |
 | id | uuid | Primary key |
 | user_id | uuid | FK to users |
 | profile_id | uuid | FK to career_profiles |
-| target_role | text | Action plan target |
-| target_id | uuid | Nullable FK to company_role_targets |
-| title | text | Action plan title |
-| summary | text | Action plan overview |
-| created_from_match_report_id | uuid | Nullable FK |
+| capability_graph_id | uuid | FK to capability_graphs |
+| target_role_id | uuid | FK to target_roles |
+| alignment_report_id | uuid | FK to alignment_reports |
+| title | text | Plan title |
+| summary | text | Plan overview |
 | model_metadata_json | jsonb | Model and prompt metadata |
 | created_at | timestamptz | Created timestamp |
 | updated_at | timestamptz | Updated timestamp |
 
-## 5.2 action_items
+## 9.2 development_actions
 
-Stores action plan milestones and preparation actions.
+Stores plan milestones and preparation actions.
 
 | Field | Type | Notes |
 | --- | --- | --- |
 | id | uuid | Primary key |
-| action_plan_id | uuid | FK to action_plans |
-| item_type | text | skill, project, interview, research |
-| title | text | Item title |
-| description | text | Item details |
+| plan_id | uuid | FK to development_plans |
+| action_type | text | skill, project, interview, evidence, research |
+| title | text | Action title |
+| description | text | Action details |
 | horizon | text | 2_weeks, 1_month, 3_months, 6_months |
 | priority | integer | Lower number means higher priority |
+| effort_level | text | low, medium, high |
 | status | text | todo, in_progress, done |
-| evidence_json | jsonb | Match gaps and source evidence behind this action |
+| linked_gap_json | jsonb | Alignment gaps and requirements addressed |
+| success_evidence | text | What completion should produce |
 | created_at | timestamptz | Created timestamp |
 | updated_at | timestamptz | Updated timestamp |
 
-## 5.3 Post-MVP applications
+## 10. AI Operations Entities
 
-Stores application pipeline records after the MVP. This table is intentionally excluded from the first version.
-
-| Field | Type | Notes |
-| --- | --- | --- |
-| id | uuid | Primary key |
-| user_id | uuid | FK to users |
-| target_id | uuid | FK to company_role_targets |
-| match_report_id | uuid | Nullable FK |
-| status | text | researching, preparing, applied, interviewing, offer, rejected, archived |
-| current_resume_id | uuid | Nullable FK to resumes |
-| notes | text | User notes |
-| next_action | text | Next action |
-| next_action_due_at | timestamptz | Optional |
-| created_at | timestamptz | Created timestamp |
-| updated_at | timestamptz | Updated timestamp |
-
-## 5.4 Post-MVP workspace_notes
-
-Stores Notion-style notes and saved insights after the MVP. This table is intentionally excluded from the first version.
-
-| Field | Type | Notes |
-| --- | --- | --- |
-| id | uuid | Primary key |
-| user_id | uuid | FK to users |
-| title | text | Note title |
-| body | text | Markdown or rich text payload |
-| linked_entity_type | text | company, target, action_plan, application |
-| linked_entity_id | uuid | Optional polymorphic reference |
-| created_at | timestamptz | Created timestamp |
-| updated_at | timestamptz | Updated timestamp |
-
-## 6. AI Operations Entities
-
-## 6.1 agent_runs
+## 10.1 agent_runs
 
 Tracks AI workflow execution.
 
@@ -355,7 +507,7 @@ Tracks AI workflow execution.
 | --- | --- | --- |
 | id | uuid | Primary key |
 | user_id | uuid | Nullable for system jobs |
-| agent_type | text | profile, company_dna, role_intelligence, matching, action_plan |
+| agent_type | text | resume, capability_graph, role_intelligence, alignment, resume_optimization, development_plan |
 | status | text | queued, running, succeeded, failed |
 | input_refs_json | jsonb | Source record references |
 | output_refs_json | jsonb | Generated record references |
@@ -364,14 +516,14 @@ Tracks AI workflow execution.
 | started_at | timestamptz | Start time |
 | completed_at | timestamptz | End time |
 
-## 6.2 embeddings
+## 10.2 embeddings
 
 Tracks vectorized content references.
 
 | Field | Type | Notes |
 | --- | --- | --- |
 | id | uuid | Primary key |
-| source_type | text | resume, company, role_template, target, match_report |
+| source_type | text | resume_evidence, capability, role_requirement, alignment_report, role_template |
 | source_id | uuid | Source record ID |
 | chunk_index | integer | Chunk order |
 | content_hash | text | Detect changes |
@@ -379,52 +531,83 @@ Tracks vectorized content references.
 | metadata_json | jsonb | Search metadata |
 | created_at | timestamptz | Created timestamp |
 
-## 7. Relationship Summary
+## 11. Post-MVP Entities
+
+Application pipeline and workspace note entities are intentionally excluded from the V2 MVP. Future modules may include:
+
+- applications
+- application_status_events
+- workspace_notes
+- interview_preparation_records
+- organization_accounts
+
+## 12. Relationship Summary
 
 ```text
 users
   -> career_profiles
   -> profile_versions
+  -> resumes -> resume_versions -> resume_sections
+  -> resume_evidence
   -> experiences
   -> projects
+  -> education_records
   -> profile_skills -> skills
   -> career_preferences
 
-users
-  -> company_role_targets -> companies
-  -> company_role_targets -> role_templates
-  -> match_reports
-  -> action_plans -> action_items
+career_profiles
+  -> capability_graphs -> capabilities -> capability_evidence
+  -> capability_gaps
 
-companies
-  -> company_role_targets
+users
+  -> target_roles -> role_requirements
+  -> role_workflows
+
+capability_graphs + target_roles
+  -> alignment_reports -> alignment_requirement_results
+  -> resume_optimizations -> resume_optimization_suggestions
+  -> development_plans -> development_actions
 
 agent_runs
-  -> generated profile_versions, match_reports, action_plans, company DNA, role intelligence
+  -> generated resume_versions, capability_graphs, target_roles, alignment_reports,
+     resume_optimizations, and development_plans
 ```
 
-## 8. MVP Migration Order
+## 13. MVP Migration Order
 
 Recommended initial migration order:
 
 1. users
 2. career_profiles
 3. resumes
-4. experiences
-5. projects
-6. skills
-7. profile_skills
-8. career_preferences
-9. companies
-10. role_templates
-11. company_role_targets
-12. match_reports
-13. action_plans
-14. action_items
-15. agent_runs
-16. embeddings
+4. resume_versions
+5. resume_sections
+6. resume_evidence
+7. experiences
+8. projects
+9. education_records
+10. skills
+11. profile_skills
+12. career_preferences
+13. capability_graphs
+14. capabilities
+15. capability_evidence
+16. capability_gaps
+17. role_templates
+18. target_roles
+19. role_requirements
+20. role_workflows
+21. alignment_reports
+22. alignment_requirement_results
+23. resume_optimizations
+24. resume_optimization_suggestions
+25. development_plans
+26. development_actions
+27. agent_runs
+28. embeddings
 
 Post-MVP migrations:
 
 - applications
 - workspace_notes
+- organization_accounts

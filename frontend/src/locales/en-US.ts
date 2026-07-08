@@ -1,7 +1,7 @@
 export default {
   navigation: {
     dashboard: "Dashboard",
-    talentProfile: "Talent Profile",
+    talentProfile: "Resume Intelligence",
     companyIntelligence: "Company Intelligence",
     roleIntelligence: "Role Intelligence",
     matchReport: "Match Report",
@@ -21,48 +21,42 @@ export default {
       disconnected: "Disconnected"
     },
     talentProfile: {
-      eyebrow: "Talent Profile",
-      title: "Structured professional identity",
-      lede: "Foundation page for profile data, evidence, and versions.",
+      eyebrow: "Resume Intelligence",
+      title: "Resume evidence to capability analysis",
+      lede: "Upload a resume or paste resume text to generate structured identity, capability, evidence, and improvement signals.",
+      upload: {
+        title: "Upload resume",
+        description: "PDF, TXT, Markdown, DOC, or DOCX. Text files are parsed locally for this foundation workflow.",
+        status: "Input status",
+        emptyStatus: "Waiting for resume",
+        readyStatus: "{name} ready",
+        textReadyStatus: "Pasted text ready"
+      },
       fields: {
-        education: {
-          label: "Education",
-          placeholder: "MSc Computer Science, University...\nData analytics certificate..."
-        },
-        skills: {
-          label: "Skills",
-          placeholder: "Python\nSQL\nMarket research\nStakeholder communication"
-        },
-        projects: {
-          label: "Projects",
-          placeholder: "Built a churn dashboard that reduced weekly reporting time by 40%..."
-        },
-        targetRoles: {
-          label: "Target Roles",
-          placeholder: "Data Analyst\nProduct Analyst\nBusiness Intelligence Analyst"
+        resumeText: {
+          label: "Resume text",
+          placeholder: "Paste resume text here to preview evidence extraction. PDF upload is accepted as an artifact; detailed PDF text extraction is a later service integration."
         }
       },
       actions: {
-        analyze: "Analyze Profile",
+        analyze: "Analyze Resume",
         analyzing: "Analyzing..."
       },
       report: {
-        ariaLabel: "Talent profile report",
-        careerIdentity: "Career Identity",
+        ariaLabel: "Resume intelligence report",
+        candidateIdentity: "Candidate Identity",
         capabilities: "Capabilities",
-        evidence: "Evidence",
-        strengths: "Strengths",
-        gaps: "Gaps",
-        recommendedRoles: "Recommended Roles"
+        evidence: "Experience Evidence",
+        suggestions: "Improvement Suggestions"
       },
       empty: {
-        ariaLabel: "Report preview",
-        title: "Structured Talent Profile",
+        ariaLabel: "Resume intelligence preview",
+        title: "Structured Resume Intelligence",
         description:
-          "Complete the inputs and run the analysis to generate a career identity, capability map, evidence summary, strengths, gaps, and recommended roles."
+          "Upload a resume or paste resume text to generate capability cards, evidence cards, confidence signals, and next-step recommendations."
       },
       errors: {
-        analysisFailed: "Profile analysis failed. Confirm the backend is running and try again."
+        analysisFailed: "Resume analysis failed. Confirm the backend is running and try again."
       }
     },
     companyIntelligence: {

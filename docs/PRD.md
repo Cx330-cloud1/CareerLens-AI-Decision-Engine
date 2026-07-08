@@ -2,301 +2,320 @@
 
 ## 1. Product Overview
 
-CareerLens is an AI Career Decision Engine for university students and early-career technology professionals. It helps users decide which roles and companies are worth pursuing, why they fit or do not fit, and what actions would most improve their chances.
+CareerLens is an AI Talent-Role Alignment Platform.
 
-CareerLens is not a resume optimizer, job board, application tracker, or generic chatbot. The MVP is a focused decision system that combines:
+Its core goal is to reduce mismatch between candidate capabilities and company role requirements. CareerLens turns a resume and target role into structured intelligence: what the candidate can credibly demonstrate, what the role actually requires, where the alignment is strong, where the gaps are, and what actions would improve readiness.
 
-- Structured talent profiling
-- Curated company and role intelligence
-- Explainable, evidence-based fit analysis
-- Confidence-aware career action planning
+CareerLens is not a resume writer, job board, application tracker, or generic chatbot. Resume optimization is one module inside a broader evidence-based alignment workflow.
 
-## 2. Positioning
+The V2 product loop is:
 
-CareerLens bridges talent intelligence, company intelligence, and role intelligence.
+```text
+Resume Upload
+  -> Resume Intelligence
+  -> Talent Capability Graph
+  -> Role Intelligence
+  -> Talent-Role Alignment Report
+  -> Resume Optimization
+  -> Career Development Plan
+```
 
-Users should move from reactive job application behavior to informed career strategy:
+## 2. Product Positioning
 
-- Who am I professionally?
-- Which company and role combinations fit me?
-- What evidence supports or weakens that fit?
-- What should I do next?
+CareerLens sits between talent intelligence, role intelligence, and career strategy.
+
+Users should be able to answer:
+
+- What capabilities can I prove from my resume, projects, and experience?
+- What does this role require beyond the visible job description?
+- Which requirements do I satisfy with strong evidence?
+- Which gaps are highest priority?
+- How should I optimize my resume and development plan for this target?
+
+The product experience must emphasize structured analysis, explainable recommendations, confidence levels, and source evidence instead of open-ended chat.
 
 ## 3. Target Users
 
 ### Phase 1 Users
 
-- Chinese university students in computer science, AI, software engineering, data science, information systems, and related fields
+- University students in computer science, AI, software engineering, data science, information systems, product management, and related fields
 - Early-career technology professionals with 0-5 years of experience
-- Users targeting internet, AI, software, enterprise technology, and platform companies
+- Candidates targeting internet, AI, software, enterprise technology, platform, and data roles
 
 ### Future Users
 
-- Global technology talent
 - Career coaches and education programs
-- Enterprise talent intelligence and internal mobility teams
+- Recruiting teams evaluating role readiness and internal mobility
+- Enterprise talent intelligence teams
+- Global technology talent
 
-## 4. Supported Career Paths
+## 4. Supported Role Families
 
-Initial supported paths:
+Initial supported role families:
 
 - AI Engineer
 - Software Engineer
 - AI Product Manager
 - AI Solution Engineer
 - Data Analyst / Data Scientist / Data Engineer
-- Other technology-related roles
+- Other technology and digital roles
 
 ## 5. Core User Problems
 
-### Problem 1: Fragmented Self-Understanding
+### Problem 1: Resume Evidence Is Unstructured
 
-Users have resumes, projects, skills, internships, and preferences, but lack a structured model of their professional identity.
+Candidates have projects, internships, coursework, and achievements, but the evidence is not mapped to capabilities in a way that supports role decisions.
 
-### Problem 2: Weak Market Context
+### Problem 2: Role Requirements Are Ambiguous
 
-Users often apply to companies without understanding company strategy, business model, technical focus, hiring preferences, or role expectations.
+Job descriptions often omit hidden competencies, workflow realities, evaluation signals, and seniority expectations.
 
-### Problem 3: Unclear Fit
+### Problem 3: Fit Analysis Is Shallow
 
-Users do not know why a role fits or does not fit them. Existing tools often provide shallow keyword matching.
+Keyword matching cannot explain why a candidate fits or does not fit a role. Users need evidence-backed capability comparison.
 
-### Problem 4: No Actionable Career Strategy
+### Problem 4: Resume Optimization Lacks Strategy
 
-Users need action plans, skill improvement plans, and project recommendations based on their current profile and target path.
+Candidates often edit resumes without understanding which evidence matters for a target role or which gaps cannot be solved by wording alone.
+
+### Problem 5: Development Plans Are Too Generic
+
+Users need gap-based improvement roadmaps connected to the capabilities required by a role.
 
 ## 6. Product Principles
 
-- Explainability over black-box recommendations
-- Structured intelligence over chat-only interaction
-- Strategic guidance over one-off resume edits
-- Calm professional SaaS experience over colorful AI assistant UI
-- Confidence-aware guidance over false precision
-- Evidence-backed recommendations over generic advice
+- Talent-role alignment over generic career advice
+- Structured intelligence over chatbot-only interaction
+- Evidence-backed recommendations over unsupported summaries
+- Capability mapping over keyword matching
+- Confidence-aware scoring over false precision
+- Resume optimization as alignment communication, not resume writing
+- Career development plans tied to concrete gaps
 
 ## 7. Core Modules
 
-## 7.1 Talent Intelligence Layer
+## 7.1 Resume Intelligence
 
-### Career Profile Agent
+Resume Intelligence converts an uploaded PDF or pasted resume into structured, reviewable profile data.
 
 Inputs:
 
-- Resume
-- Structured profile import
-- Projects
-- Skills
-- Education
-- Work experience
-- Career preferences
-- Target roles and industries
+- Resume PDF upload
+- Pasted resume text
+- User-edited experience, project, education, skill, and preference fields
 
 Outputs:
 
-- Structured professional profile
-- Technical capability assessment
-- Product capability assessment
-- Domain knowledge assessment
-- Strengths
-- Weaknesses
-- Suitable career directions
-- Evidence-backed capability map
+- Parsed resume sections
+- Experience extraction
+- Project and achievement extraction
+- Education and credential extraction
+- Resume evidence records
+- Missing or weak evidence indicators
+- Initial capability signals with confidence levels
 
-### Key Requirements
+Key requirements:
 
-- Users can upload or paste resume content.
-- Users can manually edit parsed profile sections.
-- The system extracts skills, experience, projects, education, and preferences.
-- The system generates an explainable career identity summary.
-- The system stores profile versions over time.
+- Users can upload resume PDFs.
+- The system extracts resume text and stores the original artifact.
+- Users can review and edit extracted fields.
+- Extracted records preserve links back to resume evidence.
+- The system flags incomplete, vague, duplicated, or low-evidence sections.
 
-## 7.2 Company and Role Intelligence Layer
+## 7.2 Capability Intelligence
 
-### Company DNA Analysis
+Capability Intelligence builds a Talent Capability Graph from resume evidence and user-edited profile data.
 
-The system provides structured company analysis for target employers such as Tencent, ByteDance, Google, Microsoft, and similar technology companies.
+The capability graph includes:
 
-Company DNA analysis includes:
+- Capability nodes such as programming, AI/ML, data analysis, product thinking, communication, leadership, domain knowledge, and execution
+- Evidence links to projects, experience, education, achievements, and resume sections
+- Confidence scores for each capability
+- Strength indicators
+- Skill and experience gaps
+- Capability progression over profile versions
 
-- Business model
-- Core product areas
-- AI strategy
-- Technical focus
-- Hiring preferences
-- Common role families
-- Candidate signals valued by the company
-- Culture and working style signals where evidence is available
-- Strategic talent needs inferred from company direction
+Key requirements:
 
-### Role Intelligence
+- Capabilities must be evidence-linked.
+- Each inferred capability includes confidence and rationale.
+- Users can inspect which resume evidence supports each capability.
+- Users can mark capabilities as verified, developing, or aspirational.
+- The graph should support role-specific filtering.
 
-Role intelligence turns a target role into structured expectations that can be compared against a talent profile.
+## 7.3 Role Intelligence
 
-Role intelligence includes:
+Role Intelligence turns a target job description or role template into structured requirements.
 
-- Core responsibilities
-- Required and preferred capabilities
+Inputs:
+
+- Job description text
+- Curated role templates
+- Company and industry context where available
+- User-selected role family and seniority
+
+Outputs:
+
+- Required capabilities
+- Preferred capabilities
+- Responsibilities and real job workflow
 - Seniority expectations
 - Evaluation signals
-- Common project evidence
-- Interview and preparation focus
+- Hidden competency inferences
+- Evidence examples that would demonstrate readiness
+- Requirement confidence and source references
 
-### Industry Intelligence
+Key requirements:
 
-Industry intelligence includes:
+- Users can paste or upload a job description.
+- The system extracts explicit requirements.
+- The system infers hidden competencies with clear rationale and confidence.
+- The system explains the likely real job workflow behind the role.
+- Role requirements are normalized so they can be compared with the capability graph.
 
-- Emerging roles
-- Skill trends
-- Technology changes
-- Hiring market shifts
-- Role-specific capability expectations
+## 7.4 Alignment Engine
 
-### Key Requirements
+The Alignment Engine compares candidate capabilities with role requirements and generates a Talent-Role Alignment Report.
 
-- Users can search and save companies.
-- Users can view structured company intelligence pages.
-- Users can view role intelligence pages for supported career paths.
-- Users can compare company-role combinations by relevance, capability requirements, and career fit.
-- Admin or ingestion workflows can update curated company and role intelligence sources.
+The report includes:
 
-## 7.3 Decision Intelligence Layer
+- Overall alignment score
+- Capability-level alignment
+- Strength analysis
+- Gap analysis
+- Evidence quality assessment
+- Requirement coverage
+- Risk and uncertainty indicators
+- Recommended decision posture
+- Resume optimization suggestions
 
-### Explainable Match Analysis Engine
+Scoring dimensions:
 
-The matching engine compares a user profile against a company-role target. The first version does not require real-time job scraping or a full application pipeline; users evaluate curated role templates or manually entered target roles.
+- Capability match: demonstrated capabilities versus role requirements
+- Evidence strength: quality, specificity, and recency of supporting proof
+- Experience relevance: similarity between prior work and expected role workflow
+- Requirement coverage: explicit and inferred role requirements covered by evidence
+- Gap severity: importance and difficulty of missing capabilities
+- Confidence: completeness and reliability of available data
 
-The system explains:
+Key requirements:
 
-- Overall match score
-- Skill alignment
-- Experience relevance
-- Domain alignment
-- Career preference alignment
-- Strengths
-- Skill gaps
-- Evidence behind each judgment
-- Confidence level for each score
-- Decision recommendation
+- Users can generate an alignment report for a target role.
+- Every score includes evidence, rationale, and confidence.
+- Gaps are prioritized by role impact, not only by missing keywords.
+- The report distinguishes "can improve wording" from "needs actual capability development."
+- Reports are saved and comparable across profile and role versions.
 
-### Scoring Dimensions
+## 7.5 Resume Optimization
 
-- Skill alignment: overlap between required and demonstrated skills
-- Experience relevance: internships, projects, work history, and responsibility level
-- Domain alignment: match between industry knowledge and company domain
-- Career preference alignment: location, role type, company type, working style, growth path
-- Evidence strength: quality and specificity of supporting profile evidence
-- Confidence: how complete and reliable the available data is
+Resume Optimization helps users communicate existing evidence more effectively for a target role.
 
-### Key Requirements
+It provides:
 
-- Users can create company-role targets from curated companies, role templates, or manual input.
-- Users can generate match reports.
-- Each score includes evidence and explanation.
-- Each score includes a confidence indicator and key assumptions.
-- The system recommends next actions instead of only ranking targets.
+- Targeted resume gaps
+- Evidence placement suggestions
+- Bullet-level improvement guidance
+- Capability coverage checklist
+- Role-specific emphasis recommendations
+- Warnings when a gap requires new evidence rather than rewriting
 
-## 7.4 Career Strategy Agent
+Key requirements:
 
-The Career Strategy Agent generates:
+- Optimization suggestions are grounded in the alignment report.
+- The product should not fabricate experience or achievements.
+- Suggestions must preserve evidence traceability.
+- Users remain in control of final resume content.
 
-- Career action plan
-- Skill improvement plan
+## 7.6 Career Strategy
+
+Career Strategy creates a gap-based Career Development Plan.
+
+The plan includes:
+
+- Capability improvement roadmap
 - Project recommendations
 - Learning priorities
 - Interview preparation focus
-- Decision guidance for whether to pursue, prepare first, or deprioritize a target
+- Evidence-building actions
+- Timeline and effort estimates
+- Links from each action to the role gaps it addresses
 
-### Key Requirements
+Key requirements:
 
-- Strategy outputs must be grounded in the user's profile and target role.
-- Recommendations must be sequenced by timeline and effort.
-- Plans should be revisable when the user profile or target roles change.
-- Plans should explain which match gaps each action addresses.
-
-## 7.5 Post-MVP Application Intelligence
-
-Application Intelligence is postponed until after the decision engine proves value. It may later help users manage:
-
-- Target opportunities
-- Application preparation
-- Resume versions
-- Interview preparation
-- Application notes
-- Status tracking
-
-### Post-MVP Requirements
-
-- Users can maintain an opportunity pipeline.
-- Users can attach match reports to opportunities.
-- Users can create role-specific preparation plans.
-- Users can track status from research to offer decision.
+- Plans are generated from alignment gaps and capability graph state.
+- Actions are sequenced by impact, effort, and dependency.
+- Plans update when the resume, capability graph, role requirements, or alignment report changes.
+- Recommendations include rationale and confidence.
 
 ## 8. MVP Scope
 
 ### In Scope
 
-- User authentication placeholder design
-- Profile creation from structured manual input and resume text
-- AI-assisted profile analysis
-- Career path selection
-- Company DNA pages for a curated company set
-- Role Intelligence module for supported role families
-- Company-role target creation from curated templates or manual input
-- Explainable match report
-- Evidence-based matching with source references
-- Confidence-aware scoring and assumptions
-- Career action plan generation
-- Career action plan tied to match gaps
+- Resume PDF upload and resume text extraction
+- Resume Intelligence extraction and review workflow
+- Talent Capability Graph with evidence and confidence
+- Job description analysis and Role Intelligence
+- Hidden competency inference with rationale
+- Talent-Role Alignment Report
+- Strength and gap analysis
+- Resume optimization suggestions tied to role requirements
+- Career Development Plan based on alignment gaps
+- Versioned profile, role, and report records
+- Structured AI outputs with evidence, assumptions, and confidence
 
 ### Out of Scope for MVP
 
+- Full resume document editor
+- Automatic application submission
 - Application pipeline and status tracking
-- Workspace-style notes and saved insights
-- Enterprise dashboards
 - Real-time job board scraping
 - Automated LinkedIn login or scraping
 - LinkedIn integration
 - Payment and billing
-- Multi-user coaching workflows
-- Full ATS integration
+- Multi-user enterprise dashboards
+- ATS integration
 - Native mobile app
 
 ## 9. Primary User Stories
 
-- As a student, I want to upload my resume so CareerLens can build a structured professional profile.
-- As an early-career engineer, I want to understand which roles fit me so I can focus my preparation.
-- As a user targeting ByteDance, I want to understand the company's product areas and hiring preferences.
-- As a user evaluating a company-role target, I want a match score with clear reasons, evidence, confidence, and gaps.
-- As a user with skill gaps, I want a practical action plan and project recommendations.
-- As a user comparing targets, I want to know which one to pursue now, prepare for later, or deprioritize.
+- As a candidate, I want to upload my resume so CareerLens can extract structured experience and evidence.
+- As a candidate, I want to see a capability graph so I understand what I can credibly demonstrate.
+- As a candidate, I want to analyze a target job description so I understand explicit and hidden role requirements.
+- As a candidate, I want an alignment report showing strengths, gaps, evidence, and confidence.
+- As a candidate, I want resume optimization suggestions that are specific to a target role.
+- As a candidate, I want a development plan that tells me which capabilities to build next.
 
 ## 10. Success Metrics
 
 ### Activation
 
-- Percentage of users completing a career profile
-- Percentage of users generating at least one match report
-- Time from signup to first useful insight
+- Percentage of users uploading a resume
+- Percentage of users completing resume review
+- Percentage of users generating a capability graph
+- Time from signup to first alignment insight
 
 ### Engagement
 
-- Weekly active users
-- Company-role targets evaluated per user
-- Action plans generated per user
-- Repeated profile updates
+- Alignment reports generated per user
+- Target roles analyzed per user
+- Resume optimization sessions per report
+- Career development plans generated and revisited
+- Profile and capability graph updates over time
 
 ### Quality
 
-- User-rated usefulness of match explanations
-- User-rated accuracy of profile analysis
-- User-rated trust in confidence and evidence indicators
-- Percentage of recommendations accepted or saved
+- User-rated usefulness of capability mapping
+- User-rated accuracy of role requirement extraction
+- User-rated trust in evidence and confidence indicators
+- Percentage of optimization suggestions accepted or saved
+- Percentage of roadmap actions accepted or completed
 
 ### Outcome
 
-- Applications submitted after using CareerLens
-- Interview invitations reported
-- Skill improvement milestones completed
+- Users reporting clearer role fit decisions
+- Users improving target-role readiness scores over time
+- Users completing evidence-building projects or learning milestones
+- Interview invitations or application outcomes reported voluntarily
 
 ## 11. UX Requirements
 
@@ -307,7 +326,7 @@ The UI should feel like a mature SaaS product inspired by Notion, Linear, Claude
 - Strong information hierarchy
 - Dense but readable layouts
 - Workspace-oriented navigation
-- Structured pages, not chatbot-only flow
+- Structured pages and reports, not chatbot-only flow
 
 Avoid:
 
@@ -315,30 +334,33 @@ Avoid:
 - Colorful AI mascot styling
 - Overly playful gradients
 - Unexplained black-box scores
+- Resume-writer-only positioning
 
 ## 12. AI Requirements
 
-- AI outputs must be grounded in user profile, company intelligence, role intelligence, and target data.
-- The system should separate extraction, analysis, matching, and strategy generation.
-- Important AI outputs should include evidence, assumptions, and confidence indicators.
+- AI outputs must be structured and persisted as inspectable records.
+- Extraction, capability mapping, role analysis, alignment scoring, resume optimization, and development planning should be separate workflows.
+- Every important output should include evidence, assumptions, confidence, and source references.
 - Users must be able to edit structured data instead of being locked into generated text.
-- Generated outputs should be versioned where they affect career decisions.
-- Scores must be directional and confidence-aware, not presented as precise predictions.
+- Scores must be directional and confidence-aware.
+- The system must avoid fabricating resume evidence or making sensitive personal inferences.
 
 ## 13. Risk Considerations
 
-- Career advice must avoid false certainty.
-- Company intelligence may become stale without update workflows.
-- Resume parsing can misinterpret user experience.
-- Match scores must not appear more precise than the underlying data supports.
-- AI outputs must avoid discriminatory or sensitive personal inferences.
+- Resume parsing can misinterpret experience and affect downstream analysis.
+- Hidden competency inference may overreach without confidence controls.
+- Alignment scores can mislead if the weighting model is opaque.
+- Resume optimization must not invent achievements.
+- Career guidance must avoid false certainty.
+- Sensitive career data requires strong privacy controls.
 
 ## 14. MVP Acceptance Criteria
 
-- A user can create a profile and receive a structured career profile analysis.
-- A user can browse at least several curated company intelligence pages.
-- A user can browse role intelligence for supported career paths.
-- A user can create a company-role target and generate an explainable match report.
-- A user can inspect evidence, assumptions, and confidence for each match dimension.
-- A user can receive a career action plan based on current profile and target role.
-- All core flows are represented in the frontend design and backed by documented backend contracts.
+- A user can upload a resume PDF and review extracted structured data.
+- A user can generate a Talent Capability Graph with evidence and confidence.
+- A user can analyze a role or job description into structured requirements.
+- A user can generate a Talent-Role Alignment Report.
+- A user can inspect evidence, assumptions, confidence, strengths, and gaps for each major alignment dimension.
+- A user can receive resume optimization suggestions tied to target-role requirements.
+- A user can receive a Career Development Plan based on prioritized gaps.
+- Core flows are represented in the frontend design and backed by documented backend contracts.

@@ -1,7 +1,7 @@
 export default {
   navigation: {
     dashboard: "仪表盘",
-    talentProfile: "人才画像",
+    talentProfile: "简历智能",
     companyIntelligence: "公司情报",
     roleIntelligence: "岗位情报",
     matchReport: "匹配报告",
@@ -21,47 +21,41 @@ export default {
       disconnected: "未连接"
     },
     talentProfile: {
-      eyebrow: "人才画像",
-      title: "结构化职业身份",
-      lede: "用于沉淀画像数据、证据链与版本记录的基础页面。",
+      eyebrow: "简历智能",
+      title: "从简历证据到能力分析",
+      lede: "上传简历或粘贴简历文本，生成结构化身份、能力、证据和改进建议。",
+      upload: {
+        title: "上传简历",
+        description: "支持 PDF、TXT、Markdown、DOC、DOCX。当前基础流程会本地读取文本文件。",
+        status: "输入状态",
+        emptyStatus: "等待简历",
+        readyStatus: "{name} 已就绪",
+        textReadyStatus: "粘贴文本已就绪"
+      },
       fields: {
-        education: {
-          label: "教育背景",
-          placeholder: "计算机科学硕士，某大学...\n数据分析证书..."
-        },
-        skills: {
-          label: "技能",
-          placeholder: "Python\nSQL\n市场研究\n利益相关方沟通"
-        },
-        projects: {
-          label: "项目经历",
-          placeholder: "搭建流失分析看板，将每周报告时间减少 40%..."
-        },
-        targetRoles: {
-          label: "目标岗位",
-          placeholder: "数据分析师\n产品分析师\n商业智能分析师"
+        resumeText: {
+          label: "简历文本",
+          placeholder: "在此粘贴简历文本以预览证据抽取。PDF 会作为简历文件接收，详细 PDF 文本解析将在后续服务中接入。"
         }
       },
       actions: {
-        analyze: "分析画像",
+        analyze: "分析简历",
         analyzing: "分析中..."
       },
       report: {
-        ariaLabel: "人才画像报告",
-        careerIdentity: "职业身份",
-        capabilities: "能力图谱",
-        evidence: "证据摘要",
-        strengths: "优势",
-        gaps: "差距",
-        recommendedRoles: "推荐岗位"
+        ariaLabel: "简历智能报告",
+        candidateIdentity: "候选人身份",
+        capabilities: "能力卡片",
+        evidence: "经历证据",
+        suggestions: "改进建议"
       },
       empty: {
-        ariaLabel: "报告预览",
-        title: "结构化人才画像",
-        description: "填写信息并运行分析，生成职业身份、能力图谱、证据摘要、优势、差距与推荐岗位。"
+        ariaLabel: "简历智能预览",
+        title: "结构化简历智能",
+        description: "上传简历或粘贴简历文本后，系统会生成能力卡、证据卡、置信度信号和下一步建议。"
       },
       errors: {
-        analysisFailed: "画像分析失败。请确认后端服务已启动后重试。"
+        analysisFailed: "简历分析失败。请确认后端服务已启动后重试。"
       }
     },
     companyIntelligence: {

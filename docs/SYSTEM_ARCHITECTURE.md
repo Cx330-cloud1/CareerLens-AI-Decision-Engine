@@ -2,16 +2,16 @@
 
 ## 1. Architecture Goals
 
-CareerLens should be built as a production-quality AI Career Decision Engine with clean separation between talent profiles, company and role intelligence, AI workflows, and career action planning.
+CareerLens should be built as a production-quality AI Talent-Role Alignment Platform with clean separation between resume ingestion, talent capability intelligence, role intelligence, alignment analysis, resume optimization, and career strategy.
 
 Primary architecture goals:
 
-- Support structured career intelligence, not only chat messages
-- Keep AI-generated content traceable to source data
-- Allow iterative profile and recommendation updates
-- Separate product workflows from model provider details
-- Provide a foundation for future enterprise talent intelligence
-- Keep MVP scope focused on decision quality before application management
+- Support structured talent-role intelligence, not only chat messages
+- Keep AI-generated conclusions traceable to resume, profile, role, and source evidence
+- Allow users to review and correct extracted data
+- Separate extraction, analysis, scoring, optimization, and planning workflows
+- Preserve Vue 3, FastAPI, and independent AI service boundaries
+- Provide a scalable SaaS foundation for future education, coaching, and enterprise talent workflows
 
 ## 2. Recommended Stack
 
@@ -33,10 +33,11 @@ Primary architecture goals:
 - Alembic for migrations
 - PostgreSQL as primary relational database
 
-### AI and Agents
+### AI Service
 
+- Separate AI service for extraction, graph building, role analysis, alignment, optimization, and planning workflows
 - OpenAI API for language model and embedding capabilities
-- LangGraph for multi-step agent workflows
+- LangGraph for multi-step workflow orchestration
 - Chroma or FAISS for local/vector retrieval during MVP
 
 ### Infrastructure
@@ -45,8 +46,9 @@ Primary architecture goals:
 - PostgreSQL service
 - Backend API service
 - Frontend Vite service
+- AI service
 - Optional worker service for long-running AI jobs
-- Object storage abstraction for resumes and generated artifacts
+- Object storage abstraction for resume files and generated artifacts
 
 ## 3. High-Level System Diagram
 
@@ -58,17 +60,28 @@ Vue 3 Web App
 FastAPI Backend
   |
   |-- Auth and User Service
-  |-- Profile Service
-  |-- Company Intelligence Service
+  |-- Resume Service
+  |-- Capability Graph Service
   |-- Role Intelligence Service
-  |-- Target Evaluation Service
-  |-- Matching Service
-  |-- Career Action Plan Service
-  |-- Agent Orchestration Service
+  |-- Alignment Report Service
+  |-- Resume Optimization Service
+  |-- Career Development Plan Service
+  |-- AI Job Orchestration Service
   |
   |-- PostgreSQL
-  |-- Vector Store
   |-- Object Storage
+  |-- Vector Store
+  |
+  v
+AI Service
+  |
+  |-- Resume Intelligence Workflows
+  |-- Capability Intelligence Workflows
+  |-- Role Intelligence Workflows
+  |-- Alignment Engine Workflows
+  |-- Resume Optimization Workflows
+  |-- Career Strategy Workflows
+  |
   |-- OpenAI API
 ```
 
@@ -85,14 +98,31 @@ Responsibilities:
 
 MVP can use a simple email/password or OAuth-compatible abstraction.
 
-### Profile Service
+### Resume Service
 
 Responsibilities:
 
-- Store structured user profile data
-- Store resume text and parsed profile fields
-- Manage profile versions
-- Provide profile context to agents
+- Store uploaded resume files and extracted text
+- Store parsed resume sections
+- Track resume versions and source artifacts
+- Provide resume evidence records to capability and optimization workflows
+
+Key entities:
+
+- Resume
+- ResumeVersion
+- ResumeSection
+- ResumeEvidence
+
+### Profile and Capability Graph Service
+
+Responsibilities:
+
+- Store canonical user profile data
+- Store extracted experiences, projects, education, skills, and preferences
+- Build and persist Talent Capability Graph records
+- Link capabilities to evidence and confidence scores
+- Manage profile and graph versions
 
 Key entities:
 
@@ -101,176 +131,189 @@ Key entities:
 - ProfileVersion
 - Experience
 - Project
-- Skill
 - Education
-- CareerPreference
-
-### Company Intelligence Service
-
-Responsibilities:
-
-- Store company profiles
-- Store company AI strategy, business model, product areas, and technical focus
-- Store role families and hiring signals
-- Store company DNA attributes such as talent needs, working style signals, and evidence notes
-- Provide retrieval context for matching and strategy agents
-
-MVP can start with curated manually maintained company data.
+- Skill
+- Capability
+- CapabilityEvidence
+- CapabilityGap
 
 ### Role Intelligence Service
 
 Responsibilities:
 
-- Store reusable role templates for supported career paths
-- Store capability expectations, seniority expectations, responsibilities, and evaluation signals
-- Normalize manually entered target-role requirements
-- Provide role context to matching and action plan agents
+- Store reusable role templates for supported role families
+- Store user-submitted job descriptions
+- Extract explicit role requirements
+- Infer hidden competencies with rationale and confidence
+- Explain real job workflow and evaluation signals
+- Normalize role requirements for alignment scoring
 
-MVP role intelligence should be curated and editable. Real-time job scraping and LinkedIn integration are not part of the first version.
+Key entities:
 
-### Target Evaluation Service
+- RoleTemplate
+- TargetRole
+- RoleRequirement
+- RoleWorkflow
+- RoleCompetencyInference
+
+### Alignment Report Service
 
 Responsibilities:
 
-- Store user-created company-role targets
-- Connect targets to curated companies and role templates
-- Preserve any manually entered role description or requirements
-- Track target status as active or archived without managing an application pipeline
-
-### Matching Service
-
-Responsibilities:
-
-- Compare user profile with role intelligence and company DNA
-- Generate explainable score breakdowns
-- Store match reports
-- Track historical match changes as profiles evolve
-- Store evidence links, assumptions, and confidence indicators for each match dimension
+- Compare a Talent Capability Graph with target role requirements
+- Generate structured Talent-Role Alignment Reports
+- Store score breakdowns, strengths, gaps, evidence, assumptions, and confidence
+- Track historical alignment changes as resume, graph, or role data evolves
 
 Scoring dimensions:
 
-- Skill alignment
-- Experience relevance
-- Domain alignment
-- Career preference alignment
+- Capability match
 - Evidence strength
+- Experience relevance
+- Requirement coverage
+- Gap severity
 - Confidence
 
-### Career Action Plan Service
+### Resume Optimization Service
 
 Responsibilities:
 
-- Generate career action plans
-- Store action items and milestones
-- Connect actions to match gaps and supporting evidence
-- Update action plans after profile or target changes
+- Generate target-role resume optimization suggestions
+- Distinguish communication improvements from actual capability gaps
+- Link every suggestion to role requirements and candidate evidence
+- Store accepted, rejected, and revised suggestions for future iterations
+
+### Career Development Plan Service
+
+Responsibilities:
+
+- Generate gap-based development plans
+- Store milestones, learning actions, projects, and interview preparation items
+- Connect actions to alignment gaps and evidence needs
+- Update plans after profile, capability graph, target role, or report changes
 
 ### Post-MVP Application Workspace Service
 
 Responsibilities:
 
-Application management is postponed until after the MVP. A future service may manage application pipeline status, notes, tasks, resume versions, and interview preparation.
+Application management is postponed until after the MVP. A future service may manage opportunity pipelines, status, notes, resume versions, interview preparation, and outcomes.
 
-## 5. Agent Architecture
+## 5. AI Service Workflow Architecture
 
-CareerLens should use dedicated agent workflows instead of a single general chatbot.
+CareerLens should use dedicated structured workflows instead of a single general chatbot.
 
-### Agent Workflow Types
-
-#### Career Profile Agent
+### Resume Intelligence Workflow
 
 Inputs:
 
-- Resume text
-- Structured profile fields
-- User preferences
+- Resume file metadata
+- Extracted resume text
+- Optional user-edited fields
 
 Outputs:
 
-- Normalized profile
-- Capability assessment
-- Strengths and gaps
-- Suitable career directions
+- Parsed resume sections
+- Experience, project, education, and skill candidates
+- Evidence records
+- Missing or weak evidence indicators
+- Extraction confidence
 
-#### Company DNA Agent
+### Capability Intelligence Workflow
 
 Inputs:
 
-- Company data
-- Curated research notes
-- Industry context
+- Resume evidence
+- Structured profile records
+- User corrections
 
 Outputs:
 
-- Business model summary
-- AI strategy
-- Technical focus
-- Hiring preference analysis
-- Candidate signal analysis
-- Evidence and freshness metadata
+- Talent Capability Graph
+- Capability nodes and categories
+- Evidence links
+- Confidence scores
+- Strengths and skill gaps
 
-#### Role Intelligence Agent
+### Role Intelligence Workflow
 
 Inputs:
 
+- Job description text
 - Role template data
-- Manually entered role description
-- Curated role research notes
+- Company or industry context where available
 
 Outputs:
 
-- Capability requirements
-- Responsibilities
-- Seniority expectations
+- Explicit requirements
+- Hidden competency inferences
+- Role workflow explanation
 - Evaluation signals
-- Interview and preparation focus
+- Evidence examples
+- Requirement confidence
 
-#### Explainable Match Analysis Agent
-
-Inputs:
-
-- Career profile
-- Role intelligence
-- Company intelligence
-- User career preferences
-
-Outputs:
-
-- Directional match score
-- Score breakdown
-- Evidence
-- Gaps
-- Assumptions
-- Confidence indicators
-- Decision recommendation
-
-#### Career Action Plan Agent
+### Alignment Engine Workflow
 
 Inputs:
 
-- Career profile
-- Match reports
-- Target role
-- Skill gaps
+- Talent Capability Graph
+- Target role requirements
+- Resume evidence
+- User preferences where relevant
 
 Outputs:
 
-- Career action plan
-- Learning plan
+- Overall alignment score
+- Dimension score breakdown
+- Strength analysis
+- Gap analysis
+- Evidence assessment
+- Assumptions and confidence
+- Recommended decision posture
+
+### Resume Optimization Workflow
+
+Inputs:
+
+- Resume sections
+- Alignment report
+- Target role requirements
+- Capability evidence
+
+Outputs:
+
+- Role-specific resume improvement suggestions
+- Bullet-level guidance
+- Evidence placement suggestions
+- Gap warnings where rewriting is insufficient
+
+### Career Strategy Workflow
+
+Inputs:
+
+- Capability graph
+- Alignment report
+- Skill and evidence gaps
+- Target role workflow
+
+Outputs:
+
+- Career Development Plan
+- Learning priorities
 - Project recommendations
+- Evidence-building actions
 - Interview preparation focus
-- Sequenced actions tied to match gaps
+- Timeline and effort estimates
 
 ## 6. LangGraph Workflow Pattern
 
-Each agent should be modeled as a graph with explicit nodes:
+Each AI workflow should be modeled as a graph with explicit nodes:
 
 ```text
 Load Context
   -> Validate Inputs
   -> Retrieve Relevant Knowledge
-  -> Analyze
-  -> Score or Structure Output
+  -> Extract or Analyze
+  -> Structure Output
   -> Critique / Consistency Check
   -> Persist Result
 ```
@@ -280,43 +323,50 @@ Benefits:
 - Observable intermediate steps
 - Easier testing
 - Safer retries
-- Cleaner separation of extraction, reasoning, and persistence
+- Cleaner separation of extraction, reasoning, scoring, and persistence
 
 ## 7. Data Flow Examples
 
-### Resume to Career Profile
+### Resume to Capability Graph
 
 ```text
-User uploads resume text
+User uploads resume PDF
   -> Backend stores raw artifact
-  -> Profile Agent extracts structured fields
-  -> User reviews and edits fields
-  -> Profile Service creates profile version
-  -> Capability assessment is generated
+  -> Resume Service extracts text
+  -> AI Service parses resume sections
+  -> User reviews and edits extracted data
+  -> Profile Service creates a profile version
+  -> Capability Graph Service builds evidence-linked capabilities
 ```
 
-### Company-Role Match
+### Job Description to Role Intelligence
 
 ```text
-User creates company-role target
-  -> Target Evaluation Service links company and role context
-  -> Role Intelligence Service normalizes requirements
-  -> Matching Service loads user profile
-  -> Company Intelligence Service loads company context
-  -> Role Intelligence Service loads role context
-  -> Matching Agent computes score and explanation
-  -> Match report is saved
-  -> User sees strengths, gaps, and recommended actions
+User submits a job description
+  -> Role Intelligence Service stores target role
+  -> AI Service extracts explicit requirements
+  -> AI Service infers hidden competencies
+  -> Role workflow and evaluation signals are generated
+  -> Normalized role requirements are persisted
 ```
 
-### Career Action Plan
+### Talent-Role Alignment
 
 ```text
-User selects target path
-  -> Career Action Plan Service loads profile and match gaps
-  -> Career Action Plan Agent generates plan
-  -> User saves action plan
-  -> Action items remain tied to evidence and match gaps
+User selects a capability graph and target role
+  -> Alignment Report Service loads capabilities, evidence, and requirements
+  -> AI Service computes structured alignment analysis
+  -> Report stores scores, strengths, gaps, evidence, assumptions, and confidence
+  -> User reviews the Talent-Role Alignment Report
+```
+
+### Resume Optimization and Development Plan
+
+```text
+User opens an alignment report
+  -> Resume Optimization Service generates target-role suggestions
+  -> Career Development Plan Service generates gap-based actions
+  -> Suggestions and actions remain linked to role requirements and evidence gaps
 ```
 
 ## 8. API Design Principles
@@ -324,8 +374,9 @@ User selects target path
 - REST endpoints for core CRUD and workflow triggers
 - Strong Pydantic schemas for all contracts
 - Async job model for long-running AI workflows
-- Store generated result records rather than returning only transient text
+- Store generated result records rather than returning transient text only
 - Return explainable structured objects from AI workflows
+- Preserve version references for resume, capability graph, role, report, and plan records
 
 ## 9. Example API Surface
 
@@ -333,26 +384,32 @@ User selects target path
 POST   /api/auth/signup
 POST   /api/auth/login
 
+POST   /api/resumes
+GET    /api/resumes
+GET    /api/resumes/{resume_id}
+POST   /api/resumes/{resume_id}/analyze
+
 GET    /api/profile
 PUT    /api/profile
-POST   /api/profile/analyze
 GET    /api/profile/versions
 
-GET    /api/companies
-GET    /api/companies/{company_id}
+GET    /api/capability-graphs/current
+POST   /api/capability-graphs
+GET    /api/capability-graphs/{graph_id}
 
+POST   /api/roles/analyze
 GET    /api/roles
-GET    /api/roles/{role_template_id}
+GET    /api/roles/{target_role_id}
+GET    /api/role-templates
 
-POST   /api/targets
-GET    /api/targets
-GET    /api/targets/{target_id}
+POST   /api/alignment-reports
+GET    /api/alignment-reports/{report_id}
 
-POST   /api/matches
-GET    /api/matches/{match_report_id}
+POST   /api/resume-optimizations
+GET    /api/resume-optimizations/{optimization_id}
 
-POST   /api/action-plans
-GET    /api/action-plans/{action_plan_id}
+POST   /api/development-plans
+GET    /api/development-plans/{plan_id}
 ```
 
 ## 10. Vector Retrieval
@@ -360,9 +417,10 @@ GET    /api/action-plans/{action_plan_id}
 Vector storage should support:
 
 - Resume and project semantic retrieval
-- Company intelligence retrieval
+- Capability evidence retrieval
 - Role requirement retrieval
-- Match evidence retrieval
+- Alignment evidence retrieval
+- Knowledge retrieval for curated role templates and workflow explanations
 
 MVP options:
 
@@ -375,30 +433,32 @@ Recommendation: start with Chroma for MVP because metadata filtering and develop
 
 The platform should log:
 
-- Agent workflow execution status
+- AI workflow execution status
 - Prompt and model version identifiers
 - Input record IDs, not sensitive full payloads in logs
 - Token usage
 - Latency
 - Failure reason
 - User feedback on generated outputs
+- Version IDs for generated graph, role, report, optimization, and plan records
 
 ## 12. Security and Privacy
 
-CareerLens handles sensitive career data. Required practices:
+CareerLens handles sensitive resume and career data. Required practices:
 
 - Store secrets in environment variables
 - Encrypt sensitive documents at rest in production
 - Avoid logging raw resumes or personal data
-- Use role-based access controls in future enterprise contexts
 - Provide delete/export workflows for user data
+- Use role-based access controls in future enterprise contexts
 - Make AI usage transparent in product copy
+- Prevent resume optimization workflows from fabricating claims
 
 ## 13. Deployment Path
 
 ### Local Development
 
-- Docker Compose for PostgreSQL, backend, and frontend
+- Docker Compose for PostgreSQL, backend, frontend, and AI service
 - `.env` files for local secrets
 - Alembic migrations for database schema
 
@@ -406,8 +466,10 @@ CareerLens handles sensitive career data. Required practices:
 
 - Frontend: Vercel, Netlify, or object hosting behind CDN
 - Backend: Render, Fly.io, Railway, or container platform
+- AI service: separate container service with job execution limits
 - Database: managed PostgreSQL
 - Vector store: Chroma service or persistent volume
+- Object storage: S3-compatible bucket for resume artifacts
 
 ### Production Evolution
 
@@ -417,12 +479,13 @@ CareerLens handles sensitive career data. Required practices:
 - Feature flags
 - Rate limiting
 - Billing and subscription services
+- Organization and team support
 
 ## 14. Architectural Risks
 
-- AI workflows may become hard to evaluate without structured outputs.
-- Market intelligence can become stale without source tracking and refresh cadence.
-- Scoring may be misleading if weights are hidden or overly precise.
-- Resume parsing quality affects downstream recommendations.
+- Resume parsing quality affects every downstream recommendation.
+- Hidden competency inference can become unreliable without confidence and evidence controls.
+- Alignment scoring may be misleading if weights and assumptions are hidden.
 - Vector retrieval must not replace canonical relational records for important user data.
-- Application pipeline, workspace notes, LinkedIn integration, and real-time job scraping should not leak into MVP architecture.
+- Resume optimization must not create unsupported claims.
+- Application pipeline, LinkedIn integration, and real-time job scraping should not leak into MVP architecture.

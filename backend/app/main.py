@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
 from app.api.profile import router as profile_router
+from app.api.resumes import router as resumes_router
 from app.core.config import settings
 
 app = FastAPI(
@@ -25,3 +26,4 @@ app.add_middleware(
 
 app.include_router(health_router, prefix="/api")
 app.include_router(profile_router, prefix="/api")
+app.include_router(resumes_router, prefix="/api")
