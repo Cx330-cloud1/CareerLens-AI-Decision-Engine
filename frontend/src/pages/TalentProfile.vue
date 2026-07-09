@@ -1,105 +1,162 @@
 <template>
   <section class="page-section resume-intelligence">
-    <header class="profile-header">
-      <p class="eyebrow">{{ t("pages.talentProfile.eyebrow") }}</p>
-      <h1>{{ t("pages.talentProfile.title") }}</h1>
-      <p class="lede">{{ t("pages.talentProfile.lede") }}</p>
+    <header class="page-header profile-header">
+      <div class="page-header__meta">
+        <span class="status-token">Resume Intelligence</span>
+        <span :class="['status-token', analysis ? '' : 'status-token--neutral']">
+          {{ analysis ? "Analysis ready" : "Awaiting input" }}
+        </span>
+      </div>
+      <h1>Build a professional talent dossier</h1>
+      <p class="lede">
+        Upload a resume or paste text to produce structured candidate identity, capability
+        signals, evidence strength, confidence, and improvement priorities.
+      </p>
     </header>
 
     <div class="intelligence-workspace">
-      <form class="upload-panel" @submit.prevent="handleAnalyze">
-        <label class="upload-dropzone">
-          <span class="upload-title">{{ t("pages.talentProfile.upload.title") }}</span>
-          <span class="upload-copy">{{ selectedFileName || t("pages.talentProfile.upload.description") }}</span>
-          <input
-            type="file"
-            accept=".pdf,.txt,.md,.doc,.docx"
-            @change="handleFileChange"
-          />
-        </label>
-
-        <label class="field-group">
-          <span>{{ t("pages.talentProfile.fields.resumeText.label") }}</span>
-          <textarea
-            v-model="resumeText"
-            :placeholder="t('pages.talentProfile.fields.resumeText.placeholder')"
-            rows="10"
-          />
-        </label>
-
-        <div class="upload-meta">
-          <span>{{ t("pages.talentProfile.upload.status") }}</span>
+      <WorkspacePanel class="upload-panel">
+        <div class="panel-heading">
+          <span class="section-kicker">Candidate input</span>
           <strong>{{ uploadStatus }}</strong>
         </div>
 
-        <button class="analyze-button" type="submit" :disabled="isAnalyzing || !canAnalyze">
-          {{ isAnalyzing ? t("pages.talentProfile.actions.analyzing") : t("pages.talentProfile.actions.analyze") }}
-        </button>
+        <form @submit.prevent="handleAnalyze">
+          <label class="upload-dropzone">
+            <span class="upload-title">{{ t("pages.talentProfile.upload.title") }}</span>
+            <span class="upload-copy">
+              {{ selectedFileName || t("pages.talentProfile.upload.description") }}
+            </span>
+            <input
+              type="file"
+              accept=".pdf,.txt,.md,.doc,.docx"
+              @change="handleFileChange"
+            />
+          </label>
 
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-      </form>
+          <label class="field-group">
+            <span>{{ t("pages.talentProfile.fields.resumeText.label") }}</span>
+            <textarea
+              v-model="resumeText"
+              :placeholder="t('pages.talentProfile.fields.resumeText.placeholder')"
+              rows="12"
+            />
+          </label>
+
+          <button class="primary-button" type="submit" :disabled="isAnalyzing || !canAnalyze">
+            {{ isAnalyzing ? t("pages.talentProfile.actions.analyzing") : t("pages.talentProfile.actions.analyze") }}
+          </button>
+
+          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        </form>
+      </WorkspacePanel>
 
       <section
         v-if="analysis"
         class="analysis-panel"
         :aria-label="t('pages.talentProfile.report.ariaLabel')"
       >
-        <article class="identity-card">
-          <div>
-            <span class="card-label">{{ t("pages.talentProfile.report.candidateIdentity") }}</span>
-            <h2>{{ analysis.candidate_identity.headline }}</h2>
+        <WorkspacePanel class="identity-card">
+          <div class="identity-card__header">
+            <div>
+              <span class="section-kicker">{{ t("pages.talentProfile.report.candidateIdentity") }}</span>
+              <h2>{{ analysis.candidate_identity.headline }}</h2>
+            </div>
+            <span class="confidence-badge">
+              {{ formatConfidence(analysis.candidate_identity.confidence) }}
+            </span>
           </div>
-          <span class="confidence-badge">
-            {{ formatConfidence(analysis.candidate_identity.confidence) }}
-          </span>
           <p>{{ analysis.candidate_identity.summary }}</p>
-        </article>
+          <div class="identity-meta">
+            <div>
+              <span>Name</span>
+              <strong>{{ analysis.candidate_identity.name || "Unknown" }}</strong>
+            </div>
+            <div>
+              <span>Target direction</span>
+              <strong>{{ analysis.candidate_identity.target_direction || "Not specified" }}</strong>
+            </div>
+            <div>
+              <span>Parsing status</span>
+              <strong>{{ analysis.parsing_status }}</strong>
+            </div>
+          </div>
+          <ConfidenceMeter
+            :value="analysis.candidate_identity.confidence"
+            label="Identity confidence"
+          />
+        </WorkspacePanel>
 
-        <div class="section-heading">
-          <span class="card-label">{{ t("pages.talentProfile.report.capabilities") }}</span>
-          <strong>{{ analysis.capabilities.length }}</strong>
+        <div class="metric-grid">
+          <MetricBlock
+            label="Capability signals"
+            :value="analysis.capabilities.length"
+            detail="Mapped from resume evidence"
+          />
+          <MetricBlock
+            label="Evidence cards"
+            :value="analysis.experience_evidence.length"
+            detail="Source excerpts extracted"
+          />
+          <MetricBlock
+            label="Improvement priorities"
+            :value="analysis.improvement_suggestions.length"
+            detail="Ordered by career impact"
+          />
+          <MetricBlock
+            label="Average confidence"
+            :value="averageConfidence"
+            detail="Across capability map"
+            variant="accent"
+          />
         </div>
 
-        <div class="capability-grid">
-          <article
-            v-for="capability in analysis.capabilities"
-            :key="capability.capability_id"
-            class="capability-card"
-          >
-            <div class="card-topline">
-              <h3>{{ capability.name }}</h3>
-              <span>{{ formatConfidence(capability.confidence) }}</span>
-            </div>
-            <p>{{ capability.rationale }}</p>
-            <div class="tag-row">
-              <span>{{ capability.category }}</span>
-              <span>{{ capability.level }}</span>
-            </div>
-          </article>
-        </div>
-
-        <div class="evidence-layout">
-          <section class="evidence-panel">
-            <div class="section-heading">
-              <span class="card-label">{{ t("pages.talentProfile.report.evidence") }}</span>
-              <strong>{{ analysis.experience_evidence.length }}</strong>
-            </div>
+        <WorkspacePanel class="capability-map">
+          <div class="section-heading">
+            <span class="section-kicker">Capability map</span>
+            <strong>{{ analysis.capabilities.length }}</strong>
+          </div>
+          <div class="capability-grid">
             <article
-              v-for="item in analysis.experience_evidence"
-              :key="item.evidence_id"
-              class="evidence-card"
+              v-for="capability in analysis.capabilities"
+              :key="capability.capability_id"
+              class="capability-card"
             >
               <div class="card-topline">
-                <span>{{ item.source_section }}</span>
-                <strong>{{ item.strength }}</strong>
+                <h3>{{ capability.name }}</h3>
+                <span>{{ capability.level }}</span>
               </div>
-              <p>{{ item.excerpt }}</p>
+              <p>{{ capability.rationale }}</p>
+              <div class="tag-row">
+                <span>{{ capability.category }}</span>
+                <span>{{ capability.evidence_ids.length }} evidence links</span>
+              </div>
+              <ConfidenceMeter :value="capability.confidence" label="Capability confidence" />
             </article>
-          </section>
+          </div>
+        </WorkspacePanel>
 
-          <section class="suggestion-panel">
+        <div class="evidence-layout">
+          <WorkspacePanel class="evidence-panel">
             <div class="section-heading">
-              <span class="card-label">{{ t("pages.talentProfile.report.suggestions") }}</span>
+              <span class="section-kicker">Experience evidence</span>
+              <strong>{{ analysis.experience_evidence.length }}</strong>
+            </div>
+            <EvidenceCard
+              v-for="item in analysis.experience_evidence"
+              :key="item.evidence_id"
+              :source="item.source_section"
+              :strength="item.strength"
+              :excerpt="item.excerpt"
+              :confidence="item.confidence"
+              :capability="evidenceCapabilityMap[item.evidence_id]?.capability"
+              :relevance="evidenceCapabilityMap[item.evidence_id]?.relevance"
+            />
+          </WorkspacePanel>
+
+          <WorkspacePanel class="suggestion-panel">
+            <div class="section-heading">
+              <span class="section-kicker">Improvement queue</span>
               <strong>{{ analysis.improvement_suggestions.length }}</strong>
             </div>
             <article
@@ -112,15 +169,40 @@
                 <span>{{ suggestion.priority }}</span>
               </div>
               <p>{{ suggestion.rationale }}</p>
+              <ConfidenceMeter :value="suggestion.confidence" label="Recommendation confidence" />
             </article>
-          </section>
+          </WorkspacePanel>
         </div>
       </section>
 
-      <section v-else class="empty-report" :aria-label="t('pages.talentProfile.empty.ariaLabel')">
-        <span class="card-label">{{ t("pages.talentProfile.empty.title") }}</span>
-        <p>{{ t("pages.talentProfile.empty.description") }}</p>
+      <section
+        v-else-if="isAnalyzing"
+        class="analysis-panel"
+        :aria-label="t('pages.talentProfile.report.ariaLabel')"
+      >
+        <WorkspacePanel class="loading-panel">
+          <span class="section-kicker">Analyzing evidence</span>
+          <div class="skeleton skeleton-title" />
+          <div class="skeleton skeleton-line" />
+          <div class="skeleton skeleton-line short" />
+        </WorkspacePanel>
+        <div class="loading-grid">
+          <div v-for="item in 4" :key="item" class="skeleton-card">
+            <div class="skeleton skeleton-line short" />
+            <div class="skeleton skeleton-title" />
+            <div class="skeleton skeleton-line" />
+          </div>
+        </div>
       </section>
+
+      <EmptyState
+        v-else
+        class="empty-report"
+        :aria-label="t('pages.talentProfile.empty.ariaLabel')"
+        :eyebrow="t('pages.talentProfile.empty.title')"
+        title="A structured report will appear here"
+        :description="t('pages.talentProfile.empty.description')"
+      />
     </div>
   </section>
 </template>
@@ -129,14 +211,21 @@
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 
+import ConfidenceMeter from "../components/ConfidenceMeter.vue";
+import EmptyState from "../components/EmptyState.vue";
+import EvidenceCard from "../components/EvidenceCard.vue";
+import MetricBlock from "../components/MetricBlock.vue";
+import WorkspacePanel from "../components/WorkspacePanel.vue";
 import { analyzeResume, type ResumeAnalysisResponse } from "../services/api";
+
+const RESUME_STORAGE_KEY = "careerlens.latestResumeAnalysis";
 
 const { t } = useI18n();
 
 const selectedFile = ref<File | null>(null);
 const selectedFileName = ref("");
 const resumeText = ref("");
-const analysis = ref<ResumeAnalysisResponse | null>(null);
+const analysis = ref<ResumeAnalysisResponse | null>(loadSavedResume());
 const isAnalyzing = ref(false);
 const errorMessage = ref("");
 
@@ -153,6 +242,31 @@ const uploadStatus = computed(() => {
   }
 
   return t("pages.talentProfile.upload.textReadyStatus");
+});
+
+const averageConfidence = computed(() => {
+  const capabilities = analysis.value?.capabilities ?? [];
+  if (!capabilities.length) {
+    return "Pending";
+  }
+
+  const total = capabilities.reduce((sum, capability) => sum + capability.confidence, 0);
+  return `${Math.round((total / capabilities.length) * 100)}%`;
+});
+
+const evidenceCapabilityMap = computed(() => {
+  const result: Record<string, { capability: string; relevance: string }> = {};
+
+  for (const capability of analysis.value?.capabilities ?? []) {
+    for (const evidenceId of capability.evidence_ids) {
+      result[evidenceId] = {
+        capability: capability.name,
+        relevance: `${capability.category} signal at ${capability.level} level`
+      };
+    }
+  }
+
+  return result;
 });
 
 const handleFileChange = async (event: Event) => {
@@ -186,6 +300,7 @@ const handleAnalyze = async () => {
       file_size: selectedFile.value?.size ?? resumeText.value.length,
       resume_text: resumeText.value
     });
+    localStorage.setItem(RESUME_STORAGE_KEY, JSON.stringify(analysis.value));
   } catch {
     errorMessage.value = t("pages.talentProfile.errors.analysisFailed");
   } finally {
@@ -201,55 +316,79 @@ const isTextReadable = (file: File): boolean => {
   );
 };
 
+function loadSavedResume(): ResumeAnalysisResponse | null {
+  const rawValue = localStorage.getItem(RESUME_STORAGE_KEY);
+  if (!rawValue) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(rawValue) as ResumeAnalysisResponse;
+  } catch {
+    return null;
+  }
+}
+
 const formatConfidence = (value: number): string => `${Math.round(value * 100)}%`;
 </script>
 
 <style scoped>
 .resume-intelligence {
-  max-width: 1180px;
+  display: grid;
+  gap: 24px;
 }
 
 .profile-header {
-  margin-bottom: 28px;
+  max-width: 940px;
 }
 
 .intelligence-workspace {
   display: grid;
-  grid-template-columns: minmax(300px, 400px) 1fr;
-  gap: 24px;
+  grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
+  gap: 18px;
   align-items: start;
 }
 
-.upload-panel,
-.empty-report,
-.identity-card,
-.capability-card,
-.evidence-card,
-.suggestion-card {
-  border: 1px solid #dedbd2;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 1px 2px rgb(17 24 39 / 5%);
-}
-
 .upload-panel {
+  position: sticky;
+  top: 24px;
   display: grid;
   gap: 18px;
   padding: 20px;
+}
+
+.panel-heading {
+  display: grid;
+  gap: 6px;
+}
+
+.panel-heading strong {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.upload-panel form {
+  display: grid;
+  gap: 16px;
 }
 
 .upload-dropzone {
   position: relative;
   display: grid;
   gap: 8px;
-  min-height: 148px;
+  min-height: 154px;
   align-content: center;
-  border: 1px dashed #9ca3af;
-  border-radius: 8px;
-  background: #fafafa;
-  color: #374151;
+  border: 1px dashed var(--border-strong);
+  border-radius: 10px;
+  background: #f5f3ed;
+  color: #4d504b;
   cursor: pointer;
   padding: 22px;
+}
+
+.upload-dropzone:hover {
+  border-color: #9ea997;
+  background: #f0eee8;
 }
 
 .upload-dropzone input {
@@ -260,76 +399,14 @@ const formatConfidence = (value: number): string => `${Math.round(value * 100)}%
 }
 
 .upload-title {
-  color: #111827;
+  color: var(--text);
   font-size: 16px;
-  font-weight: 750;
+  font-weight: 780;
 }
 
-.upload-copy,
-.upload-meta {
-  color: #6b7280;
+.upload-copy {
+  color: var(--text-muted);
   font-size: 13px;
-  line-height: 1.45;
-}
-
-.field-group {
-  display: grid;
-  gap: 8px;
-  color: #374151;
-  font-size: 14px;
-  font-weight: 650;
-}
-
-.field-group textarea {
-  width: 100%;
-  resize: vertical;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  color: #111827;
-  font: inherit;
-  font-size: 14px;
-  line-height: 1.5;
-  padding: 10px 12px;
-}
-
-.field-group textarea:focus {
-  outline: 2px solid #2563eb;
-  outline-offset: 1px;
-  border-color: #2563eb;
-}
-
-.upload-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.upload-meta strong {
-  color: #111827;
-  font-weight: 650;
-  text-align: right;
-}
-
-.analyze-button {
-  border: 0;
-  border-radius: 8px;
-  background: #111827;
-  color: #fff;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 700;
-  padding: 12px 16px;
-}
-
-.analyze-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
-
-.error-message {
-  margin: 0;
-  color: #b91c1c;
-  font-size: 14px;
   line-height: 1.5;
 }
 
@@ -339,134 +416,146 @@ const formatConfidence = (value: number): string => `${Math.round(value * 100)}%
 }
 
 .identity-card,
-.capability-card,
-.evidence-card,
-.suggestion-card,
-.empty-report {
-  padding: 20px;
-}
-
-.identity-card {
+.capability-map,
+.evidence-panel,
+.suggestion-panel,
+.loading-panel {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
+  gap: 18px;
+  padding: 22px;
 }
 
-.identity-card p {
-  grid-column: 1 / -1;
-  margin: 0;
-  color: #374151;
-  font-size: 16px;
-  line-height: 1.65;
-}
-
-h2,
-h3 {
-  margin: 0;
-  color: #111827;
-}
-
-h2 {
-  margin-top: 6px;
-  font-size: 22px;
-}
-
-h3 {
-  font-size: 15px;
-  line-height: 1.35;
-}
-
-.card-label {
-  color: #6b7280;
-  font-size: 12px;
-  font-weight: 750;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.confidence-badge,
-.tag-row span,
-.card-topline span,
-.card-topline strong {
-  border-radius: 999px;
-  background: #eef2ff;
-  color: #3730a3;
-  font-size: 12px;
-  font-weight: 750;
-  line-height: 1;
-  padding: 7px 9px;
-  white-space: nowrap;
-}
-
-.section-heading,
-.card-topline {
+.identity-card__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
 }
 
-.section-heading strong {
-  color: #111827;
+.identity-card p,
+.capability-card p,
+.suggestion-card p {
+  margin: 0;
+  color: var(--text-muted);
   font-size: 14px;
+  line-height: 1.6;
+}
+
+.identity-card > p {
+  max-width: 78ch;
+  font-size: 16px;
+}
+
+.identity-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.identity-meta div {
+  display: grid;
+  gap: 5px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fbfaf7;
+  padding: 12px;
+}
+
+.identity-meta span {
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 760;
+}
+
+.identity-meta strong {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.35;
 }
 
 .capability-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.capability-card,
-.evidence-card,
-.suggestion-card {
-  display: grid;
   gap: 12px;
 }
 
-.capability-card p,
-.evidence-card p,
-.suggestion-card p,
-.empty-report p {
-  margin: 0;
-  color: #4b5563;
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.tag-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tag-row span {
-  background: #f3f4f6;
-  color: #374151;
+.capability-card,
+.suggestion-card,
+.skeleton-card {
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fffefa;
+  padding: 16px;
 }
 
 .evidence-layout {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
+  grid-template-columns: 1.08fr 0.92fr;
   gap: 18px;
 }
 
 .evidence-panel,
 .suggestion-panel {
-  display: grid;
-  gap: 12px;
   align-content: start;
 }
 
-.empty-report {
-  min-height: 280px;
+.loading-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
-@media (max-width: 1040px) {
+.skeleton {
+  overflow: hidden;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #e8e4da 0%, #f5f3ed 48%, #e8e4da 100%);
+  background-size: 220% 100%;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-title {
+  width: 62%;
+  height: 28px;
+}
+
+.skeleton-line {
+  width: 100%;
+  height: 12px;
+}
+
+.skeleton-line.short {
+  width: 46%;
+}
+
+@keyframes skeleton-pulse {
+  from {
+    background-position: 120% 0;
+  }
+
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+@media (max-width: 1100px) {
   .intelligence-workspace,
+  .capability-grid,
   .evidence-layout,
-  .capability-grid {
+  .identity-meta,
+  .loading-grid {
     grid-template-columns: 1fr;
+  }
+
+  .upload-panel {
+    position: static;
   }
 }
 </style>

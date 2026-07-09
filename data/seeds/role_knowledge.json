@@ -1,0 +1,404 @@
+{
+  "categories": [
+    {
+      "category_id": "technology",
+      "name": "Technology",
+      "description": "Engineering and technical delivery roles that build, operate, and improve digital systems."
+    },
+    {
+      "category_id": "product",
+      "name": "Product",
+      "description": "Roles that translate customer, market, and business signals into product decisions."
+    },
+    {
+      "category_id": "data",
+      "name": "Data",
+      "description": "Analytics and intelligence roles that convert raw information into decisions and operating insight."
+    },
+    {
+      "category_id": "business",
+      "name": "Business",
+      "description": "Strategy, operations, growth, and customer-facing roles that turn execution into business outcomes."
+    }
+  ],
+  "capabilities": [
+    {
+      "capability_id": "cap-api-systems",
+      "name": "API and system design",
+      "category": "technical",
+      "description": "Designs reliable services, data contracts, integrations, and operational boundaries."
+    },
+    {
+      "capability_id": "cap-software-delivery",
+      "name": "Software delivery",
+      "category": "technical",
+      "description": "Ships maintainable code through testing, review, iteration, and production feedback."
+    },
+    {
+      "capability_id": "cap-product-reasoning",
+      "name": "Product requirement reasoning",
+      "category": "product",
+      "description": "Turns ambiguous needs into scoped requirements, tradeoffs, and measurable outcomes."
+    },
+    {
+      "capability_id": "cap-user-research",
+      "name": "User and market discovery",
+      "category": "product",
+      "description": "Uses qualitative and quantitative signals to identify customer problems and adoption risks."
+    },
+    {
+      "capability_id": "cap-sql-analytics",
+      "name": "SQL and analytical modeling",
+      "category": "analysis",
+      "description": "Builds datasets, metrics, and analysis flows that answer business questions accurately."
+    },
+    {
+      "capability_id": "cap-dashboarding",
+      "name": "Dashboard and metric communication",
+      "category": "analysis",
+      "description": "Presents metrics with clear definitions, caveats, and action implications."
+    },
+    {
+      "capability_id": "cap-stakeholder-alignment",
+      "name": "Stakeholder alignment",
+      "category": "collaboration",
+      "description": "Aligns priorities, decisions, and tradeoffs across teams with different incentives."
+    },
+    {
+      "capability_id": "cap-business-operations",
+      "name": "Business operations analysis",
+      "category": "business",
+      "description": "Finds process bottlenecks, defines operating metrics, and improves execution cadence."
+    },
+    {
+      "capability_id": "cap-gtm-analysis",
+      "name": "Go-to-market analysis",
+      "category": "business",
+      "description": "Connects customer segments, channels, positioning, and revenue signals to execution plans."
+    },
+    {
+      "capability_id": "cap-ai-workflow",
+      "name": "AI workflow fluency",
+      "category": "technical",
+      "description": "Applies AI tools and model outputs with structured evaluation, risk awareness, and human review."
+    }
+  ],
+  "templates": [
+    {
+      "template_id": "tpl-backend-engineer",
+      "category_id": "technology",
+      "title": "Backend Engineer",
+      "role_family": "Engineering",
+      "seniority": "Mid",
+      "summary": "Builds APIs, services, data flows, and production systems that support product and business workflows.",
+      "business_context": "Technology role in a product-led environment with reliability, delivery quality, and cross-functional execution expectations.",
+      "responsibilities": [
+        "Design and implement backend APIs, service logic, and data access patterns.",
+        "Improve reliability, observability, and performance of production services.",
+        "Collaborate with product and frontend partners to clarify requirements and integration contracts.",
+        "Write tests, review code, and document technical decisions for maintainability."
+      ],
+      "capability_mappings": [
+        {
+          "mapping_id": "map-backend-api",
+          "capability_id": "cap-api-systems",
+          "importance": "critical",
+          "evidence_examples": [
+            "Designed REST or GraphQL APIs with versioning, validation, and error handling.",
+            "Owned a service integration with clear data contracts and monitoring."
+          ],
+          "common_gaps": [
+            "Only lists frameworks without system design tradeoffs.",
+            "No evidence of production debugging or reliability ownership."
+          ],
+          "development_actions": [
+            "Build a small service with documented API contracts, tests, logging, and failure cases.",
+            "Write a design note explaining data model, scaling assumptions, and tradeoffs."
+          ],
+          "confidence": 0.9
+        },
+        {
+          "mapping_id": "map-backend-delivery",
+          "capability_id": "cap-software-delivery",
+          "importance": "critical",
+          "evidence_examples": [
+            "Shipped features through tests, review, deployment, and post-release validation.",
+            "Reduced defects or cycle time through refactoring or tooling improvements."
+          ],
+          "common_gaps": [
+            "Project descriptions stop at implementation and omit validation.",
+            "No mention of tests, code review, or operational feedback."
+          ],
+          "development_actions": [
+            "Add unit and integration tests to a representative project.",
+            "Document one production-like issue and how it was diagnosed."
+          ],
+          "confidence": 0.88
+        },
+        {
+          "mapping_id": "map-backend-alignment",
+          "capability_id": "cap-stakeholder-alignment",
+          "importance": "important",
+          "evidence_examples": [
+            "Negotiated API scope or delivery sequence with product and frontend teams.",
+            "Clarified ambiguous requirements before implementation."
+          ],
+          "common_gaps": [
+            "Evidence is purely solo technical work.",
+            "Tradeoffs with non-engineering stakeholders are not visible."
+          ],
+          "development_actions": [
+            "Convert a project into a requirement-to-implementation case study.",
+            "Practice explaining technical decisions in business impact terms."
+          ],
+          "confidence": 0.76
+        }
+      ],
+      "common_gaps": [
+        "Thin production evidence beyond course or demo projects.",
+        "Insufficient explanation of tradeoffs, reliability, and ownership."
+      ],
+      "development_actions": [
+        "Create one deployable backend project with tests, observability notes, and API documentation.",
+        "Prepare two stories covering debugging, tradeoff decisions, and measurable impact."
+      ]
+    },
+    {
+      "template_id": "tpl-ai-product-analyst",
+      "category_id": "product",
+      "title": "AI Product Analyst",
+      "role_family": "Product",
+      "seniority": "Mid",
+      "summary": "Connects user problems, product requirements, AI capabilities, and business metrics into evidence-based recommendations.",
+      "business_context": "AI-enabled product team where explainability, experimentation, and responsible use of model outputs matter.",
+      "responsibilities": [
+        "Translate product questions into structured analysis plans and AI workflow requirements.",
+        "Evaluate user behavior, funnel metrics, and qualitative feedback to shape roadmap decisions.",
+        "Partner with engineering, design, and business teams to define success metrics and launch criteria.",
+        "Communicate recommendations with assumptions, evidence quality, risks, and confidence."
+      ],
+      "capability_mappings": [
+        {
+          "mapping_id": "map-ai-pa-product",
+          "capability_id": "cap-product-reasoning",
+          "importance": "critical",
+          "evidence_examples": [
+            "Defined product requirements from ambiguous user or business problems.",
+            "Prioritized roadmap options using impact, effort, risk, and evidence quality."
+          ],
+          "common_gaps": [
+            "Recommendations are generic and not tied to user behavior or business goals.",
+            "No clear success metric or prioritization logic."
+          ],
+          "development_actions": [
+            "Write a PRD-style brief for an AI feature with metrics, constraints, and launch risks.",
+            "Build a prioritization table comparing three product bets."
+          ],
+          "confidence": 0.91
+        },
+        {
+          "mapping_id": "map-ai-pa-ai",
+          "capability_id": "cap-ai-workflow",
+          "importance": "critical",
+          "evidence_examples": [
+            "Designed an AI-assisted workflow with human review and evaluation criteria.",
+            "Compared model outputs using structured rubrics and failure analysis."
+          ],
+          "common_gaps": [
+            "Uses AI terminology without evaluation or risk framing.",
+            "No evidence of prompt, output, or quality control design."
+          ],
+          "development_actions": [
+            "Create an evaluation rubric for an AI feature and test sample outputs.",
+            "Document model failure modes and product mitigations."
+          ],
+          "confidence": 0.86
+        },
+        {
+          "mapping_id": "map-ai-pa-analytics",
+          "capability_id": "cap-sql-analytics",
+          "importance": "important",
+          "evidence_examples": [
+            "Analyzed activation, retention, conversion, or quality metrics.",
+            "Built a metrics view that changed a product decision."
+          ],
+          "common_gaps": [
+            "Analysis lacks metric definitions or decision impact.",
+            "No connection between data and product recommendation."
+          ],
+          "development_actions": [
+            "Create a sample funnel analysis with metric definitions and caveats.",
+            "Turn one analysis into a recommendation memo with confidence scoring."
+          ],
+          "confidence": 0.82
+        }
+      ],
+      "common_gaps": [
+        "AI claims are not supported by evaluation evidence.",
+        "Product recommendations lack prioritization and measurable outcomes."
+      ],
+      "development_actions": [
+        "Build an AI feature case study with requirements, evaluation, and risk controls.",
+        "Prepare one analytics story that directly changed a roadmap or workflow decision."
+      ]
+    },
+    {
+      "template_id": "tpl-data-analyst",
+      "category_id": "data",
+      "title": "Data Analyst",
+      "role_family": "Data",
+      "seniority": "Mid",
+      "summary": "Builds trusted analysis, metrics, and reporting that help teams make better product and business decisions.",
+      "business_context": "Data role embedded with product or business teams where insight quality and stakeholder adoption are both important.",
+      "responsibilities": [
+        "Write SQL and transform data to answer product, customer, and operating questions.",
+        "Build dashboards and recurring reporting with clear metric definitions.",
+        "Investigate trends, anomalies, and experiment results to guide decisions.",
+        "Communicate findings with assumptions, limitations, and recommended next actions."
+      ],
+      "capability_mappings": [
+        {
+          "mapping_id": "map-da-sql",
+          "capability_id": "cap-sql-analytics",
+          "importance": "critical",
+          "evidence_examples": [
+            "Built SQL analysis across multiple tables with joins, windows, and clean metric definitions.",
+            "Diagnosed a metric movement and recommended a concrete business action."
+          ],
+          "common_gaps": [
+            "Only mentions tools without analysis depth.",
+            "No caveats, assumptions, or metric definitions."
+          ],
+          "development_actions": [
+            "Create a portfolio analysis with SQL, charts, assumptions, and recommendation.",
+            "Practice explaining one metric from source table to decision."
+          ],
+          "confidence": 0.92
+        },
+        {
+          "mapping_id": "map-da-dashboard",
+          "capability_id": "cap-dashboarding",
+          "importance": "important",
+          "evidence_examples": [
+            "Created a dashboard that reduced manual reporting or improved decision speed.",
+            "Defined metric ownership, refresh cadence, and interpretation guidance."
+          ],
+          "common_gaps": [
+            "Dashboard screenshots lack business interpretation.",
+            "No evidence that stakeholders used the output."
+          ],
+          "development_actions": [
+            "Add a short decision guide to an existing dashboard.",
+            "Document stakeholder questions each metric answers."
+          ],
+          "confidence": 0.83
+        },
+        {
+          "mapping_id": "map-da-stakeholder",
+          "capability_id": "cap-stakeholder-alignment",
+          "importance": "important",
+          "evidence_examples": [
+            "Scoped analysis with stakeholders before querying data.",
+            "Explained a data limitation and aligned on a practical decision."
+          ],
+          "common_gaps": [
+            "Analysis appears disconnected from stakeholder action.",
+            "No evidence of translating findings for non-technical audiences."
+          ],
+          "development_actions": [
+            "Write an executive summary for a technical analysis.",
+            "Practice turning ambiguous questions into analysis plans."
+          ],
+          "confidence": 0.78
+        }
+      ],
+      "common_gaps": [
+        "Weak link between analysis output and business decision.",
+        "Insufficient treatment of data quality and assumptions."
+      ],
+      "development_actions": [
+        "Build one end-to-end analytics case with SQL, visualization, interpretation, and action.",
+        "Prepare a story about handling messy or incomplete data."
+      ]
+    },
+    {
+      "template_id": "tpl-business-operations-analyst",
+      "category_id": "business",
+      "title": "Business Operations Analyst",
+      "role_family": "Business",
+      "seniority": "Mid",
+      "summary": "Improves operating rhythm, process quality, and business performance through analysis, coordination, and execution systems.",
+      "business_context": "Business operations role working across teams to make execution measurable, repeatable, and easier to manage.",
+      "responsibilities": [
+        "Analyze operational processes, business metrics, and execution bottlenecks.",
+        "Build reports and operating cadences that clarify priorities and accountability.",
+        "Partner with sales, product, support, finance, or leadership teams on improvement initiatives.",
+        "Track outcomes and recommend changes based on evidence and business impact."
+      ],
+      "capability_mappings": [
+        {
+          "mapping_id": "map-bizops-ops",
+          "capability_id": "cap-business-operations",
+          "importance": "critical",
+          "evidence_examples": [
+            "Mapped a process, found a bottleneck, and improved cycle time or quality.",
+            "Created an operating metric that helped leaders manage execution."
+          ],
+          "common_gaps": [
+            "Work is described as coordination without measurable operational improvement.",
+            "No baseline, intervention, or result."
+          ],
+          "development_actions": [
+            "Document a process improvement with before and after metrics.",
+            "Create a simple operating dashboard for a recurring workflow."
+          ],
+          "confidence": 0.9
+        },
+        {
+          "mapping_id": "map-bizops-analytics",
+          "capability_id": "cap-sql-analytics",
+          "importance": "important",
+          "evidence_examples": [
+            "Used spreadsheet, BI, or SQL analysis to prioritize operational fixes.",
+            "Compared segments, trends, or funnel steps to identify leverage points."
+          ],
+          "common_gaps": [
+            "Analysis is not tied to an operating decision.",
+            "No visibility into data handling or metric logic."
+          ],
+          "development_actions": [
+            "Create an operational analysis with metric definitions and recommendation.",
+            "Practice explaining how a data cut changes the action plan."
+          ],
+          "confidence": 0.78
+        },
+        {
+          "mapping_id": "map-bizops-stakeholder",
+          "capability_id": "cap-stakeholder-alignment",
+          "importance": "critical",
+          "evidence_examples": [
+            "Aligned multiple teams around ownership, milestones, and tradeoffs.",
+            "Managed a recurring business review or execution cadence."
+          ],
+          "common_gaps": [
+            "Cross-functional work lacks decision ownership.",
+            "No evidence of conflict resolution or prioritization."
+          ],
+          "development_actions": [
+            "Prepare a case story about aligning stakeholders with different incentives.",
+            "Build a one-page operating review with owners, metrics, and next actions."
+          ],
+          "confidence": 0.87
+        }
+      ],
+      "common_gaps": [
+        "Business impact is too vague or activity-oriented.",
+        "Stakeholder coordination lacks evidence of decisions and accountability."
+      ],
+      "development_actions": [
+        "Quantify one operations project with baseline, action, result, and tradeoff.",
+        "Practice communicating operating metrics to both executives and execution teams."
+      ]
+    }
+  ]
+}

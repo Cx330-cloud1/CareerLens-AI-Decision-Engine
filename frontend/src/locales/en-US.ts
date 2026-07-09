@@ -2,10 +2,21 @@ export default {
   navigation: {
     dashboard: "Dashboard",
     talentProfile: "Resume Intelligence",
+    careerExplorer: "Career Explorer",
     companyIntelligence: "Company Intelligence",
     roleIntelligence: "Role Intelligence",
-    matchReport: "Match Report",
-    careerPlan: "Career Plan"
+    matchReport: "Alignment Report",
+    resumeOptimization: "Resume Optimization",
+    careerPlan: "Career Strategy"
+  },
+  navigationDescriptions: {
+    dashboard: "Workspace overview",
+    talentProfile: "Candidate evidence",
+    careerExplorer: "Role library",
+    roleIntelligence: "Target requirements",
+    matchReport: "Fit rationale",
+    resumeOptimization: "Resume positioning",
+    careerPlan: "Action plan"
   },
   language: {
     label: "Language",
