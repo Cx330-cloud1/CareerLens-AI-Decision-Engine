@@ -158,11 +158,3 @@ docs/        Product, architecture, and development documentation
 ```bash
 cp .env.example .env
 docker compose up --build
-```
-
-Local service URLs:
-
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:8000/api/health
-- Backend API docs: http://localhost:8000/api/docs
-- AI service: http://localhost:8100/health
